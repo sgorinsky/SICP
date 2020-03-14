@@ -4,6 +4,12 @@
   ;; only takes first 2 args
   (lambda (x y) (modulo x y)))
 
+;; own implementation of remove
+(define (rm n lst)
+  (cond ((null? lst) null)
+        ((= n (car lst)) (cdr lst))
+        (else (cons (car lst) (rm n (cdr lst))))))
+
 ;; traversing a list to go to the nth element
 (define (go-through-list a n)
     (define (gta a num k)
@@ -83,19 +89,14 @@
 
 (define b (list (list (list 0 1) 2) (list 3 4)))
 
-(display (list 'flattened b '= (flatten b)))
+(display (list 'flattened b '=> (flatten b)))
 (newline)
 
-(define (my-count-leaves tree)
-  (accumulate (lambda (x y)
-                (if (number? x) (+ y 1) y))
-              0
-              tree))
-
 (define (count-leaves tree)
-  (accumulate (lambda (x y) (+ (length (flatten x)) y))
-              0
-              tree))
+  (accumulate (lambda (x y) (+ (length (flatten x)) y)) 0 tree))
+
+(define (simple-count-leaves seq)
+  (length (flatten seq)))
 
 
 (display (list 'count-leaves: (count-leaves b)))
@@ -104,8 +105,7 @@
 ;; 2.36: accumulate with n sublists
 
 (define (accumulate-n op init seqs)
-  (if (null? (car seqs))
-      null
+  (if (null? (car seqs)) null
       (cons (accumulate op init (map car seqs))
             (accumulate-n op init (map cdr seqs)))))
 
@@ -117,17 +117,16 @@
 ;; 2.37: representing row vectors as lists and matrices as lists of row vectors
 ;;       and including vector operations
 
-(define (make-vector . args)
-  (car (list args)))
+(define (make-vector . args) args)
 
 ;;creating vectors
-(define v (list 1 2 3 4))
-(define w (list 4 3 2 1))
+(define v (make-vector 1 2 3 4))
+(define w (make-vector 4 3 2 1))
 
 (define (make-matrix . vectors)
   (if (or (number? (car vectors)) (= 1 (length (car vectors))))
       (error '(matrices must have vectors greater than length 1))
-      (car (list vectors))))
+      vectors))
 
 ;; creating matrices
 (define m (make-matrix v v v v))
@@ -139,7 +138,7 @@
 ;; vector and matrix multiplication methods
 (define (dot-product v w)
   (if (not (= (length v) (length w))) (error '(v and w different lengths))
-      (accumulate + 0 (accumulate-n * 1 (list v w)))))
+      (accumulate + 0 (accumulate-n * 1 (make-vector v w)))))
 
 (define (matrix-*-vector m x)
   (cond ((null? m) null)
@@ -179,27 +178,28 @@
 ;;    list, then fold-left and fold-right will evaluate to the same result
 (fold-left / 1 (list 5 4 3 2 1))
 (fold-right (lambda (x y) (/ y x)) 1 (list 5 4 3 2 1))
-(accumulate / 1 (list 5 4 3 2 1))
+(accumulate (lambda (x y) (/ y x)) 1 (list 5 4 3 2 1))
 
 (fold-left list null (list 1 2 3))
-(fold-right (lambda (x y) (list y x)) null (list 1 2 3))
-(accumulate list null (list 1 2 3))
+(fold-right (lambda (x y) (cons x y)) null (list 1 2 3))
+(accumulate (lambda (x y) (cons x y)) null (list 1 2 3))
 
 ;; 2.38: reverse with fold-left and fold-right
 (define (reverse sequence)
   (fold-right (lambda (x y) (append y (list x))) null sequence))
 (define (reverse-left sequence)
-  (fold-left (lambda (x y) (append y (list x))) null sequence))
+  (fold-left (lambda (x y) (cons y x)) null sequence))
 
 (reverse (list 1 2 3 4 5))
-(reverse (list 1 2 3 4 5))
+(reverse-left (list 1 2 3 4 5))
 
 
 ;; doing operations on nested sequences
 ;; here, we're taking all nested sequences from 1-5, summing them and filtering
 ;;       the even sums
 (define nested
-  (map (lambda (x) (enumerate-interval 1 x)) a))
+  (map (lambda (x) (enumerate-interval 1 x)) a)) ;; (def a (list 1 2 3 4 5))
+
 (define nested-sum (map (lambda (x) (accumulate + 0 x)) nested))
 
 (display (list "Mapping sum of evens in nested list\nfrom:" nested
@@ -245,7 +245,15 @@
                               (permutations (remove x s))))
                        s))))
 
+(define (permutations-flatmap s)
+  (if (null? s) (list null)
+      (flatmap (lambda (x)
+                 (map (lambda (p) (cons x p))
+                      (permutations-flatmap (remove x s)))) s)))
+
 (display (list "Permutations of (1 2 3):" (permutations (list 1 2 3))))
+(newline)
+(display (list "Permutations with Flatmap of (1 2 3):" (permutations (list 1 2 3))))
 (newline)
 
 ;; 2.40: unique pairs of (i, j) where 1 <= j < i <= n
@@ -263,8 +271,8 @@
 
 ;; 2.41: all distinct ordered triples 1 ≤ i < j < k ≤ n that sum to s
 (define (ordered-triples n)
-  (accumulate (lambda (x y) (append x y))
-              null
+  (accumulate
+   (lambda (x y) (append x y)) null
               (accumulate append null
                           (map (lambda (i)
                                  (map (lambda (j)
@@ -282,3 +290,5 @@
 (display (list "Ordered triples up to 5:" (ordered-triples 5)
                "\nFiltered sum of ordered triples equal to 9:"
                (sum-ordered-triples 5 9)))
+
+      
