@@ -271,15 +271,16 @@
 
 ;; 2.41: all distinct ordered triples 1 ≤ i < j < k ≤ n that sum to s
 (define (ordered-triples n)
-  (accumulate
-   (lambda (x y) (append x y)) null
-              (accumulate append null
-                          (map (lambda (i)
-                                 (map (lambda (j)
-                                        (map (lambda (k) (list i j k))
-                                             (enumerate-interval 1 (- j 1))))
-                                      (enumerate-interval 1 (- i 1))))
-                               (enumerate-interval 1 n)))))
+  (accumulate append null
+              (flatmap
+               (lambda (i)
+                 (map
+                  (lambda (j)
+                    (map
+                     (lambda (k) (list i j k))
+                     (enumerate-interval 1 (- j 1))))
+                  (enumerate-interval 1 (- i 1))))
+               (enumerate-interval 1 n))))
               
 (define (sum-ordered-triples n s)
   (filter
@@ -291,4 +292,28 @@
                "\nFiltered sum of ordered triples equal to 9:"
                (sum-ordered-triples 5 9)))
 
-      
+(define ground-list
+  (lambda (x)
+    (cond ((null? x) null)
+          ((null? (cdr x)) (ground-list (car x)))
+          (else x))))
+
+(define (ordered-quartet n)
+  (accumulate append null
+   (accumulate append null
+    (flatmap
+     (lambda (i)
+       (map
+        (lambda (j)
+          (map
+           (lambda (k)
+             (map
+              (lambda (l)
+                (list i j k l))
+              (enumerate-interval 1 (- k 1))))
+           (enumerate-interval 1 (- j 1))))
+        (enumerate-interval 1 (- i 1))))
+     (enumerate-interval 1 n)))))
+
+(newline)
+(display (list "Ordered quartet up to 5:" (ordered-quartet 5)))
