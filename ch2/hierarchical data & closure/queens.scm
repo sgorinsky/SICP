@@ -30,26 +30,51 @@
 
 ;; 2.42: complete all unfinished procs in queens proc
 
-(define (create-board size)
-  (define (generate-list-lists c n)
-    (define (generate-list a)
-      (if (= a 0) null
-          (cons 0 (generate-list (- a 1)))))
-    (if (= n 0) null
-        (cons (generate-list c) (generate-list-lists c (- n 1)))))
-  (generate-list-lists size size))
-         
-(define (queens board-size)
-  (define empty-board
-    (create-board board-size)) 
-  (define (queen-cols k)
-    (if (= k 0) (list empty-board)
-        (filter
-         (lambda (positions) (safe? k positions))
-         (flatmap
-          (lambda (rest-of-queens)
-            (map (lambda (new-row)
-                   (adjoin-position new-row k rest-of-queens))
-                 (enumerate-interval 1 board-size)))
-          (queen-cols (- k 1))))))
+(define (get-coordinate-by-column target-column coordinates) 
+  (cond ((null? coordinates) null) 
+        ((= target-column (cadr (car coordinates))) (car coordinates)) 
+        (else (get-coordinate-by-column target-column (cdr coordinates)))))
+
+(define (safe? test-column positions) 
+  ;is the coordinate in the set of positions with the given column 
+  ;"safe" with respect to all the other coordinates (that is, does not 
+  ;sit on the same row or diagonal with any other coordinate)? 
+  ;we assume all the other coordinates are already safe with respect 
+  ;to each other  
+  (define (two-coordinate-safe? c1 c2)
+    (let ((row1 (car c1)) 
+          (row2 (car c2)) 
+          (col1 (cadr c1)) 
+          (col2 (cadr c2))) 
+      (if (or (= row1 row2) ;; row check
+              (= (abs (- row1 row2)) (abs (- col1 col2)))) ;; diagonal check
+          #f 
+          #t))) 
+  (let ((test-coordinate (get-coordinate-by-column test-column positions))) 
+    ;check the test coordinate pairwise against every other coordinate, 
+    ;rolling the results up with an "and," and seeding the and with 
+    ;an initial "true" value (because a list with one coordinate is 
+    ;always "safe" 
+    (accumulate
+     (lambda (coordinate results)  
+             (and (two-coordinate-safe? test-coordinate coordinate) results)) 
+           #t 
+           (remove test-coordinate positions)))) 
+
+(define empty-board null)
+
+(define (adjoin-position row col rest)
+  (cons (list row col) rest))
+  
+(define (queens board-size) 
+  (define (queen-cols k) 
+    (if (= k 0) (list empty-board) 
+        (filter 
+         (lambda (positions) (safe? k positions)) 
+         (flatmap 
+          (lambda (rest-of-queens) 
+            (map (lambda (new-row) 
+                   (adjoin-position new-row k rest-of-queens)) 
+                 (enumerate-interval 1 board-size))) 
+          (queen-cols (- k 1)))))) 
   (queen-cols board-size))
