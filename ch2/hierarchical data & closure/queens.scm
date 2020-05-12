@@ -30,51 +30,47 @@
 
 ;; 2.42: complete all unfinished procs in queens proc
 
-(define (get-coordinate-by-column target-column coordinates) 
-  (cond ((null? coordinates) null) 
-        ((= target-column (cadr (car coordinates))) (car coordinates)) 
-        (else (get-coordinate-by-column target-column (cdr coordinates)))))
-
-(define (safe? test-column positions) 
-  ;is the coordinate in the set of positions with the given column 
-  ;"safe" with respect to all the other coordinates (that is, does not 
-  ;sit on the same row or diagonal with any other coordinate)? 
-  ;we assume all the other coordinates are already safe with respect 
-  ;to each other  
-  (define (two-coordinate-safe? c1 c2)
-    (let ((row1 (car c1)) 
-          (row2 (car c2)) 
-          (col1 (cadr c1)) 
-          (col2 (cadr c2))) 
-      (if (or (= row1 row2) ;; row check
-              (= (abs (- row1 row2)) (abs (- col1 col2)))) ;; diagonal check
-          #f 
-          #t))) 
-  (let ((test-coordinate (get-coordinate-by-column test-column positions))) 
-    ;check the test coordinate pairwise against every other coordinate, 
-    ;rolling the results up with an "and," and seeding the and with 
-    ;an initial "true" value (because a list with one coordinate is 
-    ;always "safe" 
-    (accumulate
-     (lambda (coordinate results)  
-             (and (two-coordinate-safe? test-coordinate coordinate) results)) 
-           #t 
-           (remove test-coordinate positions)))) 
-
 (define empty-board null)
 
 (define (adjoin-position row col rest)
   (cons (list row col) rest))
-  
+
+;; incomplete
+(define (safe? col positions)
+  #t)
+
 (define (queens board-size) 
-  (define (queen-cols k) 
-    (if (= k 0) (list empty-board) 
-        (filter 
-         (lambda (positions) (safe? k positions)) 
-         (flatmap 
-          (lambda (rest-of-queens) 
-            (map (lambda (new-row) 
-                   (adjoin-position new-row k rest-of-queens)) 
-                 (enumerate-interval 1 board-size))) 
-          (queen-cols (- k 1)))))) 
+  (define (queen-cols kth-col) 
+    (if (= kth-col 0) (list null)
+        (filter
+         (lambda (positions) (safe? kth-col positions))
+         (flatmap
+          (lambda (rest-of-queens)
+            (display (list "rest-of-queens: " rest-of-queens))
+            (newline)
+            (map (lambda (new-row)
+                   (display (list "new-row k:" new-row kth-col (enumerate-interval 1 board-size)))
+                   (newline)
+                   (adjoin-position new-row kth-col rest-of-queens))
+                 (enumerate-interval 1 board-size)))
+          (queen-cols (- kth-col 1))))))
   (queen-cols board-size))
+
+;; basically (queens 2) without filter
+(define (test k)
+  (if (= k 0) (list null)
+      (flatmap (lambda (rest)
+           (map (lambda (y) (adjoin-position k y rest))
+                (enumerate-interval 1 2)))
+         (test (- k 1)))))
+
+(test 2)
+
+;; making permutations to see nested tail-recursion better
+(flatmap (lambda (x)
+   (map (lambda (y)
+          (map (lambda (z) (list x y z))
+                 (enumerate-interval 1 3)))
+        (enumerate-interval 1 3)))
+ (enumerate-interval 1 3))
+
