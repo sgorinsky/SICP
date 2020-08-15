@@ -12,7 +12,9 @@
 
 (define (flipped-pairs painter)
   (let ((painter2 (beside painter (flip-vert painter))))
-    (below painter2 painter2)))(define wave4 (below wave2 wave2))
+    (below painter2 painter2)))
+
+(define wave4 (below wave2 wave2))
 
 (define (right-split painter n)
   (if (= n 0) painter
@@ -38,3 +40,15 @@
   (if (= n 0) painter
       (let ((smaller (up-split painter (- n 1))))
         (below painter (beside smaller smaller)))))
+
+(define (split primary secondary)
+  (lambda (painter n)
+    (if (= n 0) painter
+    (let ((smaller ((split primary secondary) painter n)))
+      (primary painter (secondary smaller smaller))))))
+
+(define right-split (split beside below))
+(define up-split (split below beside))
+
+
+               
