@@ -98,4 +98,14 @@
 (define (get-edge22 frame)
   (cddr frame))
 
-               
+;; 2.48: directed-line segment abstraction with vectors
+;; constructor
+(define (make-segment start end)
+  (make-vect start end))
+
+;; selectors
+(define (start-segment line)
+  (car line))
+
+(define (end-segment line)
+  (cadr line))
