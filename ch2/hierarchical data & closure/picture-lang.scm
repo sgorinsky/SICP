@@ -73,5 +73,29 @@
   (make-vect (* k (xcor-vect v))
              (* k (ycor-vect v))))
 
+;; 2.47: frame abstractions
+;; implementation 1
+;; constructor
+(define (make-frame origin edge1 edge2)
+  (list origin edge1 edge2))
+;; selectors
+(define (get-origin frame)
+  (car frame))
+(define (get-edge1 frame)
+  (cadr frame))
+(define (get-edge2 frame)
+  (caddr frame))
+
+;; implementation 2
+;; constructor
+(define (make-frame2 origin edge1 edge2)
+  (cons origin (cons edge1 edge2)))
+;; selectors
+(define (get-origin2 frame)
+  (car frame))
+(define (get-edge12 frame)
+  (cadr frame))
+(define (get-edge22 frame)
+  (cddr frame))
 
                
