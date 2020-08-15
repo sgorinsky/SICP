@@ -41,6 +41,7 @@
       (let ((smaller (up-split painter (- n 1))))
         (below painter (beside smaller smaller)))))
 
+;; 2.45: generalized split
 (define (split primary secondary)
   (lambda (painter n)
     (if (= n 0) painter
@@ -49,6 +50,28 @@
 
 (define right-split (split beside below))
 (define up-split (split below beside))
+
+;; 2.46: vector abstractions
+(define (make-vect x y)
+  (list x y))
+
+(define (xcor-vect v)
+  (car v))
+
+(define (ycor-vect v)
+  (cadr v))
+
+(define (add-vect v1 v2)
+  (make-vect (+ (xcor-vect v1) (xcor-vect v2))
+             (+ (ycor-vect v1) (ycor-vect v2))))
+
+(define (subt-vect v1 v2)
+  (make-vect (- (xcor-vect v1) (xcor-vect v2))
+             (- (ycor-vect v1) (ycor-vect v2))))
+
+(define (scale-vect v k)
+  (make-vect (* k (xcor-vect v))
+             (* k (ycor-vect v))))
 
 
                
