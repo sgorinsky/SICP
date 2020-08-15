@@ -1,4 +1,5 @@
 #lang scheme
+(require racket/trace)
 
 ;; helper functions
 (define (accumulate op initial sequence)
@@ -60,14 +61,12 @@
 (define (test k)
   (if (= k 0) (list null)
       (flatmap (lambda (rest)
-                 (newline)
-                 (display (list "rest: " rest))
            (map (lambda (y)
-                  (display (list "adjoin: " (list k y)))
                   (adjoin-position k y rest))
                 (list 1 2)))
          (test (- k 1)))))
 
+(trace test map adjoin-position)
 (test 2)
 
 (define (test-2 k)
@@ -81,7 +80,7 @@
                       (test-2 (- k 1))))
          (list 1 2))))
 
-(test-2 2)
+;(test-2 2)
 
 (define (test-3 k)
   (if (= k 0) (list null)
@@ -92,7 +91,7 @@
        (test-3 (- k 1)))))
    
 (newline)
-(test-3 3)
+;(test-3 3)
 (newline)
 ;; making permutations to see nested tail-recursion better
 (flatmap (lambda (x)
