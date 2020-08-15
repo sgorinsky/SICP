@@ -90,7 +90,7 @@
 ;; constructor
 (define (make-frame2 origin edge1 edge2)
   (cons origin (cons edge1 edge2)))
-;; selectors
+;; selectors - get-origin and get-edge1 are the same, get-edge2 is different here
 (define (get-origin2 frame)
   (car frame))
 (define (get-edge12 frame)
