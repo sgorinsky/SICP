@@ -109,3 +109,51 @@
 
 (define (end-segment line)
   (cadr line))
+
+;; 2.49: define following primitives for segments->painter
+(define (segments->painter segment-list)
+  (lambda (frame)
+    (for-each
+     (lambda (segment)
+       (draw-line ((frame-coord-map frame) (start-segment segment))
+                  ((frame-coord-map frame) (end-segment segment))))
+     segment-list)))
+
+;; first, let's define some important primitives for frames, segments -> get-corner, get-midpoint
+(define (get-corner frame)
+  (add-vect (get-edge1 frame) (get-edge2 frame)))
+
+(define (get-midpoint line)
+  (scale (add-vect (start-segment line) (end-segment line)) 0.5))
+;; a: outline of frame
+(define (frame-outline frame)
+  ((segments-painter
+    (list (make-segment (get-origin frame) (get-edge1 frame))
+          (make-segment (get-edge1 frame) (get-corner frame))
+          (make-segment (get-corner frame) (get-edge2 frame))
+          (make-segment (get-edge2 frame)) (get-origin frame)))
+   frame))
+;; b: X in frame
+(define (frame-x frame)
+  ((segments-painter
+    (list (make-segment (get-origin frame) (get-corner frame))
+          (make-segment (get-edge1 frame) (get-edge2 frame))))
+   frame))
+;; c: diamond that connects midpoints of frame
+(define (frame-outline frame)
+  ((segments-painter
+    (list (make-segment
+           (get-midpoint (make-segment (get-origin frame) (get-edge1 frame)))
+           (get-midpoint (make-segment (get-edge1 frame) (get-corner frame))))
+          (make-segment
+           (get-midpoint (make-segment (get-edge1 frame) (get-corner frame)))
+           (get-midpoint (make-segment (get-corner frame) (get-edge2 frame))))
+          (make-segment
+           (get-midpoint (make-segment (get-corner frame) (get-edge2 frame)))
+           (get-midpoint (make-segment (get-edge2 frame) (get-origin frame))))
+          (make-segment
+           (get-midpoint (make-segment (get-edge2 frame) (get-origin frame)))
+           (get-midpoint (make-segment (get-origin frame) (get-edge1 frame))))))
+   frame))
+                         
+;; d: wave painter
