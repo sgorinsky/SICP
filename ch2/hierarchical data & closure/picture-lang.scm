@@ -157,3 +157,73 @@
    frame))
                          
 ;; d: wave painter
+;; This one requires a lot of precise points, no intention to do this all by hand
+
+
+
+
+
+
+;;; Transforming painter
+(define (transform-painter painter origin corner1 corner2)
+  (lambda (frame)
+    (let ((m (frame-coord-map frame)))
+      (let ((new-origin (m origin)))
+        (painter (make-frame new-origin
+                             (sub-vect (m corner1) new-origin)
+                             (sub-vect (m corner2) new-origin)))))))
+
+;; Using transform-painter, we can create new transformations:
+;; Flip vertically
+(define (flip-vert painter)
+  (transform-painter
+   painter
+   (make-vect 0.0 1.0) ; new origin
+   (make-vect 1.0 1.0) ; new end of edge1
+   (make-vect 0.0 0.0))) ; new end of edge2
+
+;; Shrinks painter to upper-right corner
+(define (shrink-to-upper-right painter)
+  (transform-painter
+   painter
+   (make-vect 0.5 0.5)
+   (make-vect 1.0 0.5)
+   (make-vect 0.5 1.0)))
+
+;; Rotate 90-degrees
+(define (rotate90 painter)
+  (transform-painter
+   painter
+   (make-vect 1.0 0.0) ; origin
+   (make-vect 1.0 1.0) ; edge 1
+   (make-vect 0.0 0.0))) ; edge 2
+
+;; Squash inwards toward center of frame
+(define (squash-inwards painter)
+  (transform-painter
+   painter
+   (make-vect 0.0 0.0)
+   (make-vect 0.65 0.35)
+   (make-vect 0.35 0.65)))
+
+;; Beside
+;;    first transformed painter paints in left-half of frame
+;;    second transform painter paints in right-half of frame
+
+;; We create transform the paintings with a split-point that marks the border for
+;;    left and right sub-frames of transformed painters
+(define (beside painter1 painter2)
+  (let ((split-point (make-vect 0.5 0.0)))
+    (let ((paint-left (transform-painter
+                       painter1
+                       (make-vect 0.0 0.0)
+                       split-point
+                       (make-vect 0.0 1.0)))
+          (paint-right (transform-painter
+                        painter2
+                        split-point
+                        (make-vect 1.0 0.0)
+                        (make-vect 0.5 1.0))))
+      (lambda (frame)
+        (paint-left frame)
+        (paint-right frame)))))
