@@ -250,3 +250,20 @@
    (make-vect 0.0 1.0)
    (make-vect 0.0 0.0)
    (make-vect 1.0 1.0)))
+
+;; 2.51: below
+;; analogous implementation to beside
+(define (below painter1 painter2)
+  (let ((split-point (make-vect 0.0 0.5)))
+    (let ((painter-above (transform-painter
+                          painter1
+                          (make-vect 0.0 0.0) ; origin
+                          (make-vect 1.0 0.0) ; x-edge
+                          split-point)) ; half-way point
+          (painter-below (transform-painter
+                          split-point ; start is new half-way point
+                          (make-vect 1.0 0.5) ; x-edge with y split-point
+                          (make-vect 1.0 1.0)))) ; top of frame
+      (lambda (frame)
+        (painter-above frame)
+        (painter-below frame)))))
