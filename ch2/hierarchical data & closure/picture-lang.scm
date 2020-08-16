@@ -140,7 +140,7 @@
           (make-segment (get-edge1 frame) (get-edge2 frame))))
    frame))
 ;; c: diamond that connects midpoints of frame
-(define (frame-outline frame)
+(define (frame-diamond frame)
   ((segments-painter
     (list (make-segment
            (get-midpoint (make-segment (get-origin frame) (get-edge1 frame)))
@@ -158,9 +158,6 @@
                          
 ;; d: wave painter
 ;; This one requires a lot of precise points, no intention to do this all by hand
-
-
-
 
 
 
@@ -276,3 +273,19 @@
    (beside
     (rotate-270 painter1)
     (rotate-270 painter2))))
+
+;; 2.52 asks to
+;; a: add segments to wave primitive capturing a smile
+;; b: change the pattern constructed by corner split to only use one of
+;;    right-split and up-split
+;; c: modify version of square limit that has instead has Mr.Rogers looking
+;;    outward instead of inward
+
+;; Only will discuss solutions here instead of real implementations
+
+;; a requires a few line segments, capturing a smile, that's all
+
+;; b requires not having two up-splits and right-splits beside and below one
+;;   another but instead, having identities as up and right splits
+
+;; c requires flip-vert on each painter
