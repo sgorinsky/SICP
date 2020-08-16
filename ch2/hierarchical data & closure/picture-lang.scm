@@ -267,3 +267,12 @@
       (lambda (frame)
         (painter-above frame)
         (painter-below frame)))))
+
+;; using beside and rotation operations
+;;     since we want to rotate the beside painting 90 degrees for the split-point
+;;     need to rotate each painting 270 deg to get them right-side up again
+(define (below painter1 painter2)
+  (rotate-90
+   (beside
+    (rotate-270 painter1)
+    (rotate-270 painter2))))
