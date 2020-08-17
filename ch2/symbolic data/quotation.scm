@@ -15,7 +15,17 @@
 (memq 'red '((red shoes) (blue socks))) ;; #f
 (memq 'red '(red shoes blue socks)) ;; (red shoes blue socks)
 
-;; 2.54: recursive eq?
+;; 2.54: equal? checks if each element if all elements in a and b are the same
+(define (equal? a b)
+  (cond ((and (null? a) (null? b)) #t)
+        ((and (pair? (car a)) (pair? (car b)))
+         (and (equal? (car a) (car b)) (equal? (cdr a) (cdr b))))
+        ((not (eq? (car a) (car b))) #f)
+        (else (equal? (cdr a) (cdr b)))))
+
+(equal? '(this is a list) '(this is a list))
+
+;; recursive-eq
 (define (append l1 l2)
   (if (null? l1) l2
       (cons (car l1) (append (cdr l1) l2))))
