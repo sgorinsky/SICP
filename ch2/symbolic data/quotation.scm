@@ -18,6 +18,7 @@
 ;; 2.54: equal? checks if each element if all elements in a and b are the same
 (define (equal? a b)
   (cond ((and (null? a) (null? b)) #t)
+        ((or (null? a) (null? b)) #f)
         ((and (pair? (car a)) (pair? (car b)))
          (and (equal? (car a) (car b)) (equal? (cdr a) (cdr b))))
         ((not (eq? (car a) (car b))) #f)
