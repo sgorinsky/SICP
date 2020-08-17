@@ -26,7 +26,7 @@
 
 (equal? '(this is a list) '(this is a list))
 
-;; recursive-eq
+;; recursive-eq flattens each list first
 (define (append l1 l2)
   (if (null? l1) l2
       (cons (car l1) (append (cdr l1) l2))))
@@ -48,4 +48,6 @@
 (recursive-eq? '(this is a list) '(this (is a) list))
 
 (recursive-eq? '(this is a list) '(this (is a) big list))
-    
+
+;; 2.55: Why does (car ''abracadabra) return quote
+;; Returns the car of the quote-list which is a quote, cdr is abracadabra
