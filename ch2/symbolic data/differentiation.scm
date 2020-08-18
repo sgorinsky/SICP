@@ -8,7 +8,6 @@
   (and (variable? v1) (variable? v2) (eq? v1 v2)))
 
 
-
 (define (sum? x) (and (pair? x) (eq? (car x) '+)))
 
 (define (addend s) (cadr s)) ;; second item of sum list
@@ -54,3 +53,17 @@
          (error "unknown expression type: DERIV" exp))))
 
 ;; 2.56: Implement power rule
+(define (** x y)
+  (define (power a n)
+    (if (= n 0) a
+        (power (* a x) (- n 1))))
+  (power 1 y))
+
+(define (exponentiation? exp)
+  (and (pair? exp) (eq? (car exp) '**)))
+
+(define (base exp)
+  (cadr exp))
+
+(define (exponent exp)
+  (caddr exp))
