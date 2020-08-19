@@ -37,23 +37,23 @@
         (else (list '* m1 m2))))
 
 ;; improved deriv with more precise make-sum and make-product
-(define (deriv exp var)
-  (cond ((number? exp) 0)
-        ((variable? exp)
-         (if (same-variable? exp var) 1 0))
-        ((sum? exp)
-         (make-sum
-          (deriv (addend exp) var)
-          (deriv (augend exp) var)))
-        ((product? exp)
-         (make-sum
-          (make-product (multiplier exp)
-                        (deriv (multiplicand exp) var))
-          (make-product (deriv (multiplier exp) var) (multiplicand exp))))
-        (else
-         (error "unknown expression type: DERIV" exp))))
+;(define (deriv exp var)
+;  (cond ((number? exp) 0)
+;        ((variable? exp)
+;         (if (same-variable? exp var) 1 0))
+;        ((sum? exp)
+;         (make-sum
+;          (deriv (addend exp) var)
+;          (deriv (augend exp) var)))
+;        ((product? exp)
+;         (make-sum
+;          (make-product (multiplier exp)
+;                        (deriv (multiplicand exp) var))
+;          (make-product (deriv (multiplier exp) var) (multiplicand exp))))
+;        (else
+;         (error "unknown expression type: DERIV" exp))))
 
-;; 2.56: Implement power rule
+;; 2.56: Implement power rule in deriv proc
 (define (** x y)
   (define (power a n)
     (if (= n 0) a
@@ -74,3 +74,24 @@
         ((=number? b 0) 1)
         ((and (number? a) (number? b)) (** a b))
         (else (list '** a b))))
+
+;; deriv with power rule
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp)
+         (if (same-variable? exp var) 1 0))
+        ((sum? exp)
+         (make-sum
+          (deriv (addend exp) var)
+          (deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+          (make-product (multiplier exp)
+                        (deriv (multiplicand exp) var))
+          (make-product (deriv (multiplier exp) var) (multiplicand exp))))
+        ((exponentiation? exp)
+         (make-product
+          (exponent exp)
+          (make-exponentiation (base exp) (- (exponent exp) 1))))        
+        (else
+         (error "unknown expression type: DERIV" exp))))
