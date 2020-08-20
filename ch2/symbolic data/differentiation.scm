@@ -112,7 +112,7 @@
 
 ;; a: Develop predicates assuming all expressions are pairs
 (define (addend-infix exp) (car exp))
-(define (multiplier-infix) (car exp))
+(define (multiplier-infix exp) (car exp))
 
 (define (sum-infix? exp)
   (eq? (cadr exp) '+))
@@ -139,12 +139,21 @@
   (cond ((number? exp) 0)
         ((variable? exp)
          (if (same-variable? exp var) 1 0))
-        ((null? (cdr exp)) (deriv (car exp) var))
+        ((null? (cdr exp)) (deriv-infix (car exp) var))
         ((sum-infix? exp)
          (make-sum-infix
           (deriv-infix (addend-infix exp) var)
           (deriv-infix (cddr exp) var)))
+        ((product-infix? exp)
+         ;(make-product-infix
+          (make-sum-infix
+           (make-product-infix
+            (deriv-infix (multiplier-infix exp) var)
+            (multiplicand exp))
+           (make-product-infix
+            (deriv-infix (multiplicand exp) var)
+            (multiplier-infix exp))))
         (else
          (error "unknown expression type: DERIV" exp))))
 
-(deriv-infix (list 'x '+ 'y '+ 'x '+ 'y '+ 'x) 'x)
+(deriv-infix (list (list 'x '* 'y) '+ (list 'x '* 'y) '+ (list 'x '* 'y)) 'x)
