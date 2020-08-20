@@ -119,6 +119,7 @@
 (define (product-infix? exp)
   (eq? (cadr exp) '*))
 
+;; for assuming expressions are pairs, easy to use 2 args as building blocks
 (define (make-sum-infix a1 a2)
   (cond ((=number? a1 0) a2)
         ((=number? a2 0) a1)
@@ -131,3 +132,19 @@
         ((=number? m2 1) m1)
         ((and (number? m1) (number? m2)) (* m1 m2))
         (else (list m1 '* m2))))
+
+;; b: Normal expression representation ie. (x * 2 + 2 * x + 4 + ...)        
+  
+(define (deriv-infix exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp)
+         (if (same-variable? exp var) 1 0))
+        ((null? (cdr exp)) (deriv (car exp) var))
+        ((sum-infix? exp)
+         (make-sum-infix
+          (deriv-infix (addend-infix exp) var)
+          (deriv-infix (cddr exp) var)))
+        (else
+         (error "unknown expression type: DERIV" exp))))
+
+(deriv-infix (list 'x '+ 'y '+ 'x '+ 'y '+ 'x) 'x)
