@@ -1,5 +1,9 @@
 #lang scheme
 
+(define (accumulate op init seq)
+  (if (null? seq) init
+  (op (car seq) (accumulate op init (cdr seq)))))
+
 ;; atomic building blocks for representing algebraic expressions
 
 (define (variable? x) (symbol? x))
@@ -84,7 +88,9 @@
         ((sum? exp)
          (make-sum
           (deriv (addend exp) var)
-          (deriv (augend exp) var)))
+          (if (null? (cdddr exp))
+              (deriv (augend exp) var)
+              (deriv (cons '+ (cddr exp)) var))))
         ((product? exp)
          (make-sum
           (make-product (multiplier exp)
@@ -92,9 +98,7 @@
           (make-product (deriv (multiplier exp) var) (multiplicand exp))))
         ((exponentiation? exp)
          (make-product
-          (make-product
             (exponent exp)
-            (make-exponentiation (base exp) (make-sum (exponent exp) (- 1))))
-          (deriv (base exp) var)))
+            (make-exponentiation (base exp) (make-sum (exponent exp) (- 1)))))
         (else
          (error "unknown expression type: DERIV" exp))))
