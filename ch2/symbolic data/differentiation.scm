@@ -4,6 +4,15 @@
   (if (null? seq) init
   (op (car seq) (accumulate op init (cdr seq)))))
 
+(define (full-eq? a b)
+  (cond ((and (null? a) (null? b)) #t)
+        ((or (null? a) (null? b)) #f)
+        ((or (number? a) (number? b)) (eq? a b))
+        ((and (pair? (car a)) (pair? (car b)))
+         (and (full-eq? (car a) (car b))
+              (full-eq? (cdr a) (cdr b))))
+        ((or (pair? (car a)) (pair? (car b))) #f)
+        (else (full-eq? (cdr a) (cdr b)))))
 ;; atomic building blocks for representing algebraic expressions
 
 (define (variable? x) (symbol? x))
@@ -120,12 +129,6 @@
   (eq? (cadr exp) '*))
 
 ;; for assuming expressions are pairs, easy to use 2 args as building blocks
-(define (make-sum-infix a1 a2)
-  (cond ((=number? a1 0) a2)
-        ((=number? a2 0) a1)
-        ((and (number? a1) (number? a2)) (+ a1 a2))
-        (else (list a1 '+ a2))))
-
 (define (make-product-infix m1 m2)
   (cond ((or (=number? m1 0) (=number? m2 0)) 0)
         ((=number? m1 1) m2)
@@ -133,6 +136,20 @@
         ((and (number? m1) (number? m2)) (* m1 m2))
         (else (list m1 '* m2))))
 
+(define (make-sum-infix a1 a2)
+  (cond ((=number? a1 0) a2)
+        ((=number? a2 0) a1)
+        ((and (number? a1) (number? a2)) (+ a1 a2))
+        ((full-eq? a1 a2) (list 2 '* a2))
+        (else (list a1 '+ a2))))
+
+;((and (pair? (cdr a1)) (pair? (cdr a2)) (product-infix? a1) (product-infix? a2))
+;         (make-sum-infix
+;          (make-product-infix (car a1) (cddr a1))
+;          (make-product-infix (car a2) (cddr a2))))
+;        ((and (pair? a1) (product-infix? a1)) (list (make-product-infix (car a1) (cddr a1)) '+ a2))
+;        ((and (pair? a2) (product-infix? a2)) (list (make-product-infix (car a2) (cddr a2)) '+ a1))
+        
 ;; b: Normal expression representation ie. (x * 2 + 2 * x + 4 + ...)        
   
 (define (deriv-infix exp var)
@@ -145,7 +162,6 @@
           (deriv-infix (addend-infix exp) var)
           (deriv-infix (cddr exp) var)))
         ((product-infix? exp)
-         ;(make-product-infix
           (make-sum-infix
            (make-product-infix
             (deriv-infix (multiplier-infix exp) var)
@@ -156,4 +172,4 @@
         (else
          (error "unknown expression type: DERIV" exp))))
 
-(deriv-infix (list (list 'x '* 'y) '+ (list 'x '* 'y) '+ (list 'x '* 'y)) 'x)
+(deriv-infix '(x + y * (x + y)) 'x)
