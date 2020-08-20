@@ -7,7 +7,7 @@
 (define (full-eq? a b)
   (cond ((and (null? a) (null? b)) #t)
         ((or (null? a) (null? b)) #f)
-        ((or (number? a) (number? b)) (eq? a b))
+        ((or (number? a) (number? b) (variable? a) (variable? b)) (eq? a b))
         ((and (pair? (car a)) (pair? (car b)))
          (and (full-eq? (car a) (car b))
               (full-eq? (cdr a) (cdr b))))
@@ -139,7 +139,7 @@
 (define (make-sum-infix a1 a2)
   (cond ((=number? a1 0) a2)
         ((=number? a2 0) a1)
-        ((and (number? a1) (number? a2)) (+ a1 a2))
+        ((and (number? a1) (number? a2)))
         ((full-eq? a1 a2) (list 2 '* a2))
         (else (list a1 '+ a2))))
 
@@ -160,7 +160,13 @@
         ((sum-infix? exp)
          (make-sum-infix
           (deriv-infix (addend-infix exp) var)
-          (deriv-infix (cddr exp) var)))
+          (if (and (pair? (cddr exp)) (product-infix? (cddr exp)))
+              (deriv-infix
+               (make-product-infix
+                (multiplicand exp)
+                (cddddr exp))
+               var)
+              (deriv-infix (cddr exp) var))))
         ((product-infix? exp)
           (make-sum-infix
            (make-product-infix
@@ -172,4 +178,4 @@
         (else
          (error "unknown expression type: DERIV" exp))))
 
-(deriv-infix '(x + y * (x + y)) 'x)
+(deriv-infix '(x + y + x * y) 'x)
