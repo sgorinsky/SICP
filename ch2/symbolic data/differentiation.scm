@@ -71,7 +71,8 @@
 
 (define (make-exponentiation a b)
   (cond ((=number? a 0) 0)
-        ((=number? b 0) 1)
+        ((=number? b 1) a)
+        ((or (=number? b 0) (=number? a 1)) 1)
         ((and (number? a) (number? b)) (** a b))
         (else (list '** a b))))
 
