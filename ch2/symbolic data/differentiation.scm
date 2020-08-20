@@ -38,6 +38,7 @@
         ((=number? m1 1) m2)
         ((=number? m2 1) m1)
         ((and (number? m1) (number? m2)) (* m1 m2))
+        ((and (variable? m1) (variable? m2) (eq? m1 m2)) (list '** m1 2))
         (else (list '* m1 m2))))
 
 ;; improved deriv with more precise make-sum and make-product
@@ -93,12 +94,17 @@
               (deriv (cons '+ (cddr exp)) var))))
         ((product? exp)
          (make-sum
-          (make-product (multiplier exp)
-                        (deriv (multiplicand exp) var))
-          (make-product (deriv (multiplier exp) var) (multiplicand exp))))
+           (make-product (multiplier exp)
+                         (deriv (multiplicand exp) var))
+           (make-product (deriv (multiplier exp) var)
+                         (multiplicand exp))))
         ((exponentiation? exp)
-         (make-product
-            (exponent exp)
-            (make-exponentiation (base exp) (make-sum (exponent exp) (- 1)))))
+         (if (eq? (base exp) var)
+             (make-product
+              (exponent exp)
+              (make-exponentiation (base exp) (make-sum (exponent exp) (- 1))))
+             0))
         (else
          (error "unknown expression type: DERIV" exp))))
+
+(deriv (list '* (list '** 'x 2) 'y) 'x)
