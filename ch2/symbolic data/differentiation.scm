@@ -124,9 +124,14 @@
 (define (multiplier-infix exp) (car exp))
 
 (define (sum-infix? exp)
-  (eq? (cadr exp) '+))
+  (if (or (not (pair? exp)) (null? (cdr exp)))
+      #f
+      (eq? (cadr exp) '+)))
+
 (define (product-infix? exp)
-  (eq? (cadr exp) '*))
+  (if (or (not (pair? exp)) (null? (cdr exp)))
+      #f
+      (eq? (cadr exp) '*)))
 
 ;; for assuming expressions are pairs, easy to use 2 args as building blocks
 (define (make-product-infix m1 m2)
@@ -168,14 +173,25 @@
                var)
               (deriv-infix (cddr exp) var))))
         ((product-infix? exp)
-          (make-sum-infix
-           (make-product-infix
-            (deriv-infix (multiplier-infix exp) var)
-            (multiplicand exp))
-           (make-product-infix
-            (deriv-infix (multiplicand exp) var)
-            (multiplier-infix exp))))
+         (let ((prod-deriv
+                (make-sum-infix
+                   (make-product-infix
+                    (deriv-infix (multiplier-infix exp) var)
+                    (multiplicand exp))
+                   (make-product-infix
+                    (deriv-infix (multiplicand exp) var)
+                    (multiplier-infix exp)))))
+           (if (and (pair? (cddr exp)) (not (null? (cdddr exp))))
+               (if (sum-infix? (cddr exp))
+                   (make-sum-infix
+                    prod-deriv
+                    (deriv-infix (cddddr exp) var))
+                   (make-product-infix
+                    prod-deriv
+                    (deriv-infix (cddddr exp) var)))
+               prod-deriv)))
         (else
          (error "unknown expression type: DERIV" exp))))
 
-(deriv-infix '(x + y + x * y) 'x)
+(deriv-infix '(x + y + y * x) 'x)
+(deriv-infix '(x * y + x * y + x) 'x)
