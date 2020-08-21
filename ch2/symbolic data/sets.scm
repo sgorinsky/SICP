@@ -48,15 +48,22 @@
         (else (element-of-set? x (cdr set)))))
 
 
-(define (intersection-set-ordered set1 set2)
-  (if (or (null? set1) (null? set2)) '()
-      (let ((x1 (car set1)) (x2 (car set2)))
-        (cond ((= x1 x2)
-               (cons x1 (intersection-set (cdr set1)
-                                          (cdr set2))))
-              ((< x1 x2)
-               (intersection-set (cdr set1) set2))
-              ((< x2 x1)
-               (intersection-set set1 (cdr set2)))))))
+;; find intersection with ordered-lists as sets
+;;    O(N) approach by recursively calling cdr of list with smaller car
+(define (intersection-set-ordered a b)
+  (if (or (null? a) (null? b)) '()
+      (let ((x (car a)) (y (car b)))
+        (cond ((= x y) (cons x (intersection-set-ordered (cdr a) (cdr b))))
+              ((< x y) (intersection-set-ordered (cdr a) b))
+              (else (intersection-set-ordered a (cdr b)))))))
+
+;; 2.61: adjoin-set-ordered
+;;       assuming both sets are ordered lists
+(define (adjoin-set-ordered x set)
+  (cond ((null? set) (list x))
+        ((= x (car set)) set)
+        ((< x (car set)) (cons x set))
+        (else (cons (car set) (adjoin-set-ordered x (cdr set))))))
+  
 
   
