@@ -1,5 +1,5 @@
 #lang scheme
-(require "quotation.scm" "differentiation.scm")
+;; (require "quotation.scm" "differentiation.scm")
 
 ;; Note that these implementations of unordered lists as sets is highly inefficient
 (define (element-of-set x set)
@@ -74,4 +74,24 @@
                  ((< x y) (cons x (union-set-ordered (cdr a) b)))
                  (else (cons y (union-set-ordered a (cdr b)))))))))
 
-  
+;; Binary Trees
+; Primitives
+(define (entry tree) (car tree))
+
+(define (left-branch tree) (cadr tree))
+
+(define (right-branch tree) (caddr tree))
+
+(define (make-tree entry left right)
+  (list entry left right))
+
+(define (element-of-tree-set? x tree)
+  (cond ((null? tree)  #f)
+        ((number? tree) (equal? x tree))
+        ((equal? x (entry tree)) #t)
+        ((or (< x (entry tree)) (null? (cddr tree)))
+         (element-of-tree-set? x (left-branch tree)))
+        (else (element-of-tree-set? x (right-branch tree)))))
+
+(define tree '(5 (3 (1 2) (4)) (9 (7 8) (10 11))))
+(print (list "Is 6 in tree-set? " (element-of-tree-set? 6 tree)))
