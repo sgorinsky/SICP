@@ -94,7 +94,7 @@
         (else (element-of-tree-set? x (right-branch tree)))))
 
 (define tree '(5 (3 (2 () ()) (4 () ())) (8 (7 () ()) (9 () ()))))
-(print (list "Is 6 in tree-set? " (element-of-tree-set? 6 tree)))
+(displayln (list "Is 6 in tree-set:" (element-of-tree-set? 6 tree)))
 
 (define (adjoin-element-tree x set)
   (cond ((null? set) (make-tree x '() '()))
@@ -102,4 +102,4 @@
         ((< x (entry set)) (make-tree (entry set) (adjoin-element-tree x (left-branch set)) (right-branch set)))
         (else (make-tree (entry set) (left-branch set) (adjoin-element-tree x (right-branch set))))))
 
-(print (list "adjoin 6 to tree-set? " (adjoin-element-tree 6 tree)))
+(displayln (list "adjoin 6 to tree-set:" "\n" (adjoin-element-tree 6 tree)))
