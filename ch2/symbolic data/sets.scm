@@ -64,6 +64,14 @@
         ((= x (car set)) set)
         ((< x (car set)) (cons x set))
         (else (cons (car set) (adjoin-set-ordered x (cdr set))))))
-  
+
+;; 2.62: union-set-ordered
+(define (union-set-ordered a b)
+  (cond ((null? a) b)
+        ((null? b) a)
+        (else (let ((x (car a)) (y (car b)))
+           (cond ((= x y) (cons x (union-set-ordered (cdr a) (cdr b))))
+                 ((< x y) (cons x (union-set-ordered (cdr a) b)))
+                 (else (cons y (union-set-ordered a (cdr b)))))))))
 
   
