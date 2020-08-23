@@ -103,3 +103,25 @@
         (else (make-tree (entry set) (left-branch set) (adjoin-element-tree x (right-branch set))))))
 
 (displayln (list "adjoin 6 to tree-set:" "\n" (adjoin-element-tree 6 tree)))
+
+;; 2.63: Two procs for converting trees to lists
+(define (tree->list-1 tree)
+  (if (null? tree) '()
+      (append (tree->list-1 (left-branch tree))
+              (cons (entry tree) (tree->list-1 (right-branch tree))))))
+
+(define (tree->list-2 tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree) result-list
+        (copy-to-list
+         (left-branch tree)
+         (cons (entry tree) (copy-to-list (right-branch tree) result-list)))))
+(copy-to-list tree '()))
+
+;; a: Are the two procedures for converting trees to lists the same?
+;  -> Proc 1 builds up a list by appending the resulting list from left recursive calls
+;         to right resulting list. Append call iterates through list at each step
+;         and is expensive. N recursive steps with up to N calls (len of left-branch)
+;         from append
+;  -> Proc 2 traverses tree and only concats prev entry trees to new entry trees
+;         saving extra time taken to append. 
