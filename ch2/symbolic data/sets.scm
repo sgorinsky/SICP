@@ -180,3 +180,27 @@
 
 ; b: Order of growth for this procedure?
 ;    O(2N) maybe?
+
+;; 2.65:  O(N) implementations of union-set and intersection-set with balanced binary trees
+; In order to get O(N) implementations, we can use the helper methods provided to convert
+;    trees back to sorted lists since comparing trees to one another is difficult given
+;    the potential for quite different structures
+; ie. (4 (1 () ()) (6 () ())) vs (1 (-1 () ()) (4 () ()))
+;    Both trees are balanced here but we can't compare the 1s for instance w/o traversing
+;    the other tree
+
+; Union-set-tree
+(define (union-set-tree a b)
+  (union-set-ordered (tree->list-2 a) (tree->list-2 b)))
+
+; Intersection-set-tree
+(define (intersection-set-tree a b)
+  (intersection-set-ordered (tree->list-2 a) (tree->list-2 b)))
+
+(define a (list->tree '(1 2 3 4 5)))
+(define b (list->tree '(2 3 6 7 8)))
+
+(displayln (list "compare a:" a "and b:" b))
+(displayln (list "union-set-tree:" (union-set-tree a b)))
+(displayln (list "intersection-set-tree:" (intersection-set-tree a b)))
+                                          
