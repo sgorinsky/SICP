@@ -200,7 +200,7 @@
 (define a (list->tree '(1 2 3 4 5)))
 (define b (list->tree '(2 3 6 7 8)))
 
-(displayln (list "compare a:" a "and b:" b))
-(displayln (list "union-set-tree:" (union-set-tree a b)))
-(displayln (list "intersection-set-tree:" (intersection-set-tree a b)))
+(displayln (list "compare trees of...\na:" a "\nb:" b))
+(displayln (list "for union-set-tree:" (union-set-tree a b)))
+(displayln (list "and intersection-set-tree:" (intersection-set-tree a b)))
                                           
