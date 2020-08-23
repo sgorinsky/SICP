@@ -124,4 +124,59 @@
 ;         and is expensive. N recursive steps with up to N calls (len of left-branch)
 ;         from append
 ;  -> Proc 2 traverses tree and only concats prev entry trees to new entry trees
-;         saving extra time taken to append. 
+;         saving extra time taken to append.
+
+;; b: Growth for each?
+;  -> Proc 1 takes O(N^2) in worst case (flat tree with left branch);
+;  -> Proc 2 takes O(N) in worst case, N always for N entries in tree
+
+;; 2.64: Two procs for building tree from list
+(define (list->tree elements)
+  (car (partial-tree elements (length elements))))
+
+(define (partial-tree elts n)
+  (if (= n 0)
+      (cons '() elts)
+      (let ((left-size (quotient (- n 1) 2)))
+        (let ((left-result (partial-tree elts left-size)))
+          (let ((left-tree (car left-result))
+                (non-left-elts (cdr left-result))
+                (right-size (- n (+ left-size 1))))
+            (let ((this-entry (car non-left-elts))
+                  (right-result (partial-tree (cdr non-left-elts) right-size)))
+              (let ((right-tree (car right-result)) (remaining-elts (cdr right-result)))
+                (cons (make-tree this-entry left-tree right-tree) remaining-elts))))))))
+
+; a: How does partial-tree work?
+; -> The idea is that we recursively make-trees from the left branches and right 
+;    branches. We return the tree at each recursive step as the car and keep the
+;    remaining elements toward the end of the list.
+;    We recursively break the size of the array in half (left and right sub-procs)
+;    until we reach the base case.
+;    Once we do that, we return '(() (...)) and extract () for our left branch
+;    For our right branch, we return '(() (cdr (...)). Now, we have our right branch and
+;    our left branch while keeping the cdr of remaining elements.
+;    We make the tree and return back (tree remaining-elts) and continually build the
+;    tree from the remaining elements.
+
+;; Ex: elements -> '(1 2 3)
+; base case for left branch after all recursive calls:
+;   (cons '() '(1 2 3)) <- left-result, (car left-result) <- left-tree
+;   (cdr left-result) or '(1 2 3) <- non-left-elts, this-entry <- (car non-left-elts) or 1
+;   '(() (2 3)) <- right-result, (car right-result) or '() <- right-tree 
+;   '(2 3) <- remaining-elts
+; Then we call make-tree so we have a tree-like structure that resembles
+;    '((1 () ()) 2 3)
+
+; Recursive stack popped after base-case.
+; '(1 () ()) <- left-tree is car of returned left-result which was '((1 () ()) 2 3)
+; '(2 3) <- non-left-elts is (cdr left-result)
+; 2 <- this-entry
+; '((3 () ()) ()) <- right-result (attaches null to left and right branches right-size told
+;     proc not to default to base case but to instead circle through left-right branch
+;     logic again
+;  '(3 () ()) <- right-tree 
+; (2 (1 () ()) (3 () ()) <- tree
+
+; b: Order of growth for this procedure?
+;    O(2N) maybe?
