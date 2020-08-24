@@ -203,4 +203,30 @@
 (displayln (list "compare trees of...\na:" a "\nb:" b))
 (displayln (list "for union-set-tree:" (union-set-tree a b)))
 (displayln (list "and intersection-set-tree:" (intersection-set-tree a b)))
-                                          
+
+;; Lookup for unordered-list
+
+;; Let's suppose for now that key is simply car of element
+(define key
+  (lambda (pair) (car pair)))
+(define val
+  (lambda (pair) (cadr pair)))
+(define (lookup given-key set-of-records)
+  (cond ((null? set-of-records) false)
+        ((equal? given-key (key (car set-of-records)))
+         (car set-of-records))
+        (else (lookup given-key (cdr set-of-records)))))
+
+;; 2.65: Find value for key in lookup-table structured as numerically-ordered
+;;       binary tree
+(define (lookup-tree k tree)
+  (cond ((null? tree) #f)
+        ((= k (key (entry tree))) (val (entry tree)))
+        ((< k (key (entry tree))) (lookup-tree k (left-branch tree)))
+        (else (lookup-tree k (right-branch tree)))))
+
+(define files '((4 "file4")
+                ((2 "file2") ((1 "file1") ()  ()) ((3 "file3") () ()))
+                ((6 "file6") ((5 "file5") ()  ()) ((7 "file7") () ()))))
+
+(displayln (list "lookup files with key 2:" (lookup-tree 2 files)))
