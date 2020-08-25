@@ -64,3 +64,35 @@
 (define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
 
 (displayln (list "decoding sample-message with sample-tree:" (decode sample-message sample-tree)))
+
+;; 2.68: Write encode-symbol, a proc to encode the encoding-tree traversals according
+;;       to the following encode proc
+
+(define (symbol-set tree)
+  (caddr tree))
+
+(define (encode-symbol symbol tree)
+  (let ((symbols (symbol-set tree)))
+    (cond ((null? symbols) '())
+          ((and (= 2 (length symbols)) (eq? symbol (cadr symbols))) (list 1))
+          ((eq? symbol (car symbols)) (list 0))
+          (else (cons 1 (encode-symbol symbol (right-branch tree)))))))
+
+(define (encode message tree)
+  (if (null? message) '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+
+(displayln
+ (list "encode-symbol proc should return original bit-message encoding of"
+       sample-message "\n"
+       "from" (decode sample-message sample-tree) "\n"
+       "to" (encode (decode sample-message sample-tree) sample-tree)))
+
+(displayln (list "is encoding equal to original bit-message?"
+                 (if
+                  (equal?
+                   sample-message
+                   (encode (decode sample-message sample-tree) sample-tree))
+                  "yes"
+                  "no")))
