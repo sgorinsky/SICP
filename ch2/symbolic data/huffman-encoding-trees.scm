@@ -135,3 +135,23 @@
                  "\nnumber of bits fixed length:"
                  (* (length rock-lyrics) (log (length rock-alphabet) 2))))
 
+
+;; 2.71: Suppose alphabet of 1...n symbols and frequencies of 1...2^(n-1)
+;; How many bits required to encode most frequent symbol? Least frequent?
+
+;; If we have the same kind of weighted tree as previous questions, 1 bit to encode
+;;    the most frequent symbol.
+;; For the least frequent symbol, log(2^(n-1)) bits.
+
+;; 2.72: Order of growth in encode-symbol proc generally and for special case of
+;;       n symbols with 1...2^(n-1) frequencies
+
+;; Since we use a weighted tree, there are about n/2 levels
+;;    In the worst case, we encode a message that takes n/2 time for a message of length
+;;    n. So that would suggest an O(n**2) but if we consider the average case where we access
+;;    elements that are near the top of the tree more often, like in the unique case of
+;;    elements having 1...2^(n-1) frequencies, we only need to find the general proportion
+;;    of symbol frequency to total symbol appearances (sum(1...2^(n-1))) and then sum the
+;;    corresponding time it takes to traverse the huffman-tree in order to find the element.
+;;    In the case of the most frequently occurring symbol, it only takes O(c) time since
+;;    it is the first left-branch we need to access.
