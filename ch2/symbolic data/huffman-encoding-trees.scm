@@ -111,3 +111,28 @@
 
 (displayln (list "Generate huffman tree from pairs" pairs "\n"
                  (generate-huffman-tree pairs)))
+
+;; 2.70: Generate huffman-tree and encode lyrics of rock song using symbol alphabet
+; Made sure capitalizations of symbols in alphabet matched lyrics
+(define rock-alphabet '((a 2) (Get 2) (Sha 3) (Wah 1) (boom 1) (job 2) (na 16) (yip 9)))
+
+; Huffman-encoding-tree
+(displayln (list "huffman-encoding-tree from rock alphabet:\n" (generate-huffman-tree rock-alphabet)))
+
+; Message
+(define rock-lyrics
+  '(
+    Get a job
+        Sha na na na na na na na na
+        Get a job
+        Sha na na na na na na na na
+        Wah yip yip yip yip yip yip yip yip yip
+        Sha boom
+        ))
+(define encoded-lyrics (encode rock-lyrics (generate-huffman-tree rock-alphabet)))
+(displayln (list "encoded lyrics:" encoded-lyrics
+                 "\nnumber of bits variable length:"
+                 (length encoded-lyrics)
+                 "\nnumber of bits fixed length:"
+                 (* (length rock-lyrics) (log (length rock-alphabet) 2))))
+
