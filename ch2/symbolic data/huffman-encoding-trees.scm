@@ -117,7 +117,7 @@
 (define rock-alphabet '((a 2) (Get 2) (Sha 3) (Wah 1) (boom 1) (job 2) (na 16) (yip 9)))
 
 ; Huffman-encoding-tree
-(displayln (list "huffman-encoding-tree from rock alphabet:\n" (generate-huffman-tree rock-alphabet)))
+(define rock-huffman-tree (generate-huffman-tree rock-alphabet))
 
 ; Message
 (define rock-lyrics
@@ -129,9 +129,8 @@
         Wah yip yip yip yip yip yip yip yip yip
         Sha boom
         ))
-(define encoded-lyrics (encode rock-lyrics (generate-huffman-tree rock-alphabet)))
-(displayln (list "encoded lyrics:" encoded-lyrics
-                 "\nnumber of bits variable length:"
+(define encoded-lyrics (encode rock-lyrics rock-huffman-tree))
+(displayln (list "number of bits variable length:"
                  (length encoded-lyrics)
                  "\nnumber of bits fixed length:"
                  (* (length rock-lyrics) (log (length rock-alphabet) 2))))
