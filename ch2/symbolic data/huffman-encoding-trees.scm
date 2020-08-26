@@ -73,7 +73,7 @@
 
 (define (encode-symbol symbol tree)
   (let ((symbols (symbol-set tree)))
-    (cond ((null? symbols) '())
+    (cond ((or (null? symbols) (null? (cdr symbols))) '())
           ((and (= 2 (length symbols)) (eq? symbol (cadr symbols))) (list 1))
           ((eq? symbol (car symbols)) (list 0))
           (else (cons 1 (encode-symbol symbol (right-branch tree)))))))
@@ -96,3 +96,18 @@
                    (encode (decode sample-message sample-tree) sample-tree))
                   "yes"
                   "no")))
+
+;; 2.69: design successive-merge using make-code-tree for generate-huffman-tree
+(define pairs '((A 4) (C 1) (D 1) (B 2)))
+
+(define (successive-merge leaves)
+  (define (create-tree tree set)
+    (if (null? set) tree
+        (create-tree (make-code-tree (car set) tree) (cdr set))))
+  (create-tree (car leaves) (cdr leaves)))
+
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+
+(displayln (list "Generate huffman tree from pairs" pairs "\n"
+                 (generate-huffman-tree pairs)))
