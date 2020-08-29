@@ -82,10 +82,12 @@
          (angle-polar (contents z)))
         (else (error "Unknown type: ANGLE" z))))
 
-;; examples of constructing rect and polar complex-numbers from z
+;; examples of constructing rect and polar complex-numbers from z (updated)
 (make-from-real-imag (real-part z) (imag-part z))
 
-(make-from-mag-ang (magnitude z) (angle z))
+(define (make-from-real-imag x y) (make-from-real-imag-rectangular x y))
+
+(define (make-from-mag-ang r a) (make-from-mag-ang-polar r a))
 
 ;; Operations
 (define (add-complex z1 z2)
