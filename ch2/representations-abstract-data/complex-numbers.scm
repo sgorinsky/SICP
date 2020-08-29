@@ -22,37 +22,35 @@
           z1 z2)
          (/ (magnitude z1) (magnitude z2)) (- (angle z1) (angle z2))))
 
-;; Representations of complex numbers
-
+;; Representations of complex numbers (revised to distinguish between rect and polar)
 ;; Rectangular 
 
-(define (real-part z) (car z))
-(define (imag-part z) (cdr z))
+(define (real-part-rectangular z) (car z))
+(define (imag-part-rectangular z) (cdr z))
 
-(define (magnitude z)
-  (sqrt (+ (square (real-part z)) (square (imag-part z)))))
+(define (magnitude-rectangular z)
+  (sqrt (+ (square (real-part-rectangular z))
+           (square (imag-part-rectangular z)))))
 
-(define (angle z)
-  (atan (imag-part z) (real-part z)))
-
-(define (make-from-real-imag x y) (cons x y))
-
-(define (make-from-mag-ang r a)
-  (cons (* r (cos a)) (* r (sin a))))
+(define (angle-rectangular z)
+  (atan (imag-part-rectangular z)
+        (real-part-rectangular z)))
 
 ;; Polar
-(define (magnitude-polar z) (car z))
+(define (real-part-polar z)
+  (* (magnitude-polar z) (cos (angle-polar z))))
+(define (imag-part-polar z)
+  (* (magnitude-polar z) (sin (angle-polar z))))
 
-(define (real-part-polar z) (* (magnitude-polar z) (cos (angle z))))
-(define (imag-part-polar z) (* (magnitude-polar z) (sin (angle z))))
+(define (magnitude-polar z) (car z))
 
 (define (angle-polar z) (cdr z))
 
 (define (make-from-real-imag-polar x y)
-  (cons (sqrt (+ (square x) (square y)))
-        (atan y x)))
+  (attach-tag 'polar (cons (sqrt (+ (square x) (square y))) (atan y x))))
+(define (make-from-mag-ang-polar r a)
+  (attach-tag 'polar (cons r a)))
 
-(define (make-from-mag-ang-polar r a) (cons r a))
 
 ;; We can use type tag to distinguish between rectangular and polar coords
 (define (attach-tag type-tag contents)
