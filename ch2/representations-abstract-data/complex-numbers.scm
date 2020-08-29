@@ -8,7 +8,7 @@
 
 (make-from-mag-ang (magnitude z) (angle z))
 
-;; complex operations
+;; Operations
 (define (add-complex z1 z2)
   (make-from-real-imag (+ (real-part z1) (real-part z2))
                        (+ (imag-part z1) (imag-part z2))))
@@ -39,3 +39,17 @@
 
 (define (make-from-mag-ang r a)
   (cons (* r (cos a)) (* r (sin a))))
+
+;; Polar
+(define (magnitude-polar z) (car z))
+
+(define (real-part-polar z) (* (magnitude-polar z) (cos (angle z))))
+(define (imag-part-polar z) (* (magnitude-polar z) (sin (angle z))))
+
+(define (angle-polar z) (cdr z))
+
+(define (make-from-real-imag-polar x y)
+  (cons (sqrt (+ (square x) (square y)))
+        (atan y x)))
+
+(define (make-from-mag-ang-polar r a) (cons r a))
