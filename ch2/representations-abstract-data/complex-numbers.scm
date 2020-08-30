@@ -171,3 +171,31 @@
 (define (imag-part z) (apply-generic 'imag-part z))
 (define (magnitude z) (apply-generic 'magnitude z))
 (define (angle z) (apply-generic 'angle z))
+
+(define (make-from-real-imag x y)
+  ((get 'make-from-real-imag 'rectangular) x y))
+(define (make-from-mag-ang r a)
+  ((get 'make-from-mag-ang 'polar) r a))
+
+;; 2.73: In section 2.3.2 when we made a symbolic differentiation program, we used
+;;       predicates to determine the type of a given expression (product?, sum?, ...)
+;;       But we can get the type tag in in another way...
+
+(define (deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp)
+         (if (same-variable? exp var) 1 0))
+        (else ((get 'deriv (operator exp))
+               (operands exp) var))))
+
+(define (operator exp) (car exp))
+(define (operands exp) (cdr exp))
+
+;; a: What is the new proc doing? Why aren't we assimilating number? and variable?
+;;    It's finding the necessary 'deriv operation associated with a particular type
+;;    with the given expression in the package/op table and applying it as necessary.
+;;    Since the derivative of a number/same vars are the building blocks of derivatives
+;;    and have no "type" associated with them (that can be gotten from '+, '*, etc) b/c
+;;    there are none, we just apply the basic operations for derivs of numbers/vars.
+
+;; b:
