@@ -165,3 +165,9 @@
           (error
            "No method for these types: APPLY-GENERIC"
            (list op type-tags))))))
+
+;; For example, with apply-generic, we can define our selectors as follows...
+(define (real-part z) (apply-generic 'real-part z))
+(define (imag-part z) (apply-generic 'imag-part z))
+(define (magnitude z) (apply-generic 'magnitude z))
+(define (angle z) (apply-generic 'angle z))
