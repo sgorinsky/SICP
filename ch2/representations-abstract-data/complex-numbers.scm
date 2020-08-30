@@ -107,6 +107,8 @@
 
 ;; Package (collection of procedures) that provides content to a table that is looked up
 ;;    by get and put procedures whenever a relevant item needs to be accessed
+;; The procedures may be named the same thing in both the rectangular and polar
+;;    packages, but they are local to the given package's scope
 
 ;; Rectangular-package
 (define (install-rectangular-package)
@@ -153,3 +155,13 @@
        (lambda (x y) (tag (make-from-real-imag x y))))
   (put 'make-from-mag-ang 'polar
        (lambda (r a) (tag (make-from-mag-ang r a)))) 'done)
+
+;; apply-generic looks in table for name of given operation, and applies procedure if found
+(define (apply-generic op . args)
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (apply proc (map contents args))
+          (error
+           "No method for these types: APPLY-GENERIC"
+           (list op type-tags))))))
