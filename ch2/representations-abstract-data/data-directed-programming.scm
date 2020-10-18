@@ -1,7 +1,22 @@
+#lang scheme
+;; We can use type tag to distinguish between rectangular and polar coords
+(define (type-tag datum)
+  (if (pair? datum) (car datum)
+      (error "Bad tagged datum: TYPE-TAG" datum)))
+
+(define (contents datum)
+  (if (pair? datum) (cdr datum)
+      (error "Bad tagged datum: CONTENTS" datum)))
+
+(define (attach-tag type-tag contents)
+  (cons type-tag contents))
+
 ;; Method of modularizing system design and creating packages for others to interface with
 ; ie. Representing complex-numbers in different ways
 ; And note: although both packages have some colliding names for certain procedures,
 ;    they operate within each package's namespace
+
+;; At the moment, we don't have put and get selectors
 
 ;; Rectangular-package
 (define (install-rectangular-package)
@@ -47,7 +62,8 @@
   (put 'make-from-real-imag 'polar
        (lambda (x y) (tag (make-from-real-imag x y))))
   (put 'make-from-mag-ang 'polar
-       (lambda (r a) (tag (make-from-mag-ang r a)))) 'done)
+       (lambda (r a) (tag (make-from-mag-ang r a))))
+  'done)
 
 ;; apply-generic looks in table for name of given operation, and applies procedure if found
 (define (apply-generic op . args)
@@ -92,3 +108,22 @@
 ;;    there are none, we just apply the basic operations for derivs of numbers/vars.
 
 ;; b: Procedures for derivs of sums and products
+(define (install-sum-package) ;; copy-paste procs from earlier deriv and put procs in table
+  (define (sum? x) (and (pair? x) (eq? (car x) '+)))
+  (define (addend s) (cadr s)) ;; second item of sum list
+  (define (augend s) (caddr s)) ;; third item of sum list
+  (define (make-sum a1 a2)
+    (cond ((=number? a1 0) a2)
+          ((=number? a2 0) a1)
+          ((and (number? a1) (number? a2)) (+ a1 a2))
+          (else (list '+ a1 a2))))
+  (define (deriv-sum exp)
+    (make-sum
+     (deriv (addend exp))
+     (deriv (augend exp))))
+
+  (define (tag x) (attach '+ x))
+  (put 'deriv '(+) deriv-sum)
+  (put 'make-sum '+
+       (lambda (x y) (tag (make-sum x y))))
+  'done)
