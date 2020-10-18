@@ -154,8 +154,45 @@
      (make-product (deriv (multiplier exp) var)
                    (multiplicand exp))))
 
-  (define (tag x) (attach '+ x))
+  (define (tag x) (attach '* x))
   (put 'deriv '(*) deriv-product)
   (put 'make-product '*
        (lambda (x y) (tag (make-product x y))))
+  'done)
+
+;; c: Create another deriv package other than sum or product
+(define (install-exponentiation-package)
+  (define (** x y)
+  (define (power a n)
+    (if (= n 0) a
+        (power (* a x) (- n 1))))
+  (power 1 y))
+
+  (define (exponentiation? exp)
+    (and (pair? exp) (eq? (car exp) '**)))
+
+  (define (base exp)
+    (cadr exp))
+
+  (define (exponent exp)
+    (caddr exp))
+
+  (define (make-exponentiation a b)
+    (cond ((=number? a 0) 0)
+          ((=number? b 1) a)
+          ((or (=number? b 0) (=number? a 1)) 1)
+          ((and (number? a) (number? b)) (** a b))
+          (else (list '** a b))))
+
+  (define (deriv-exp exp)
+    (if (eq? (base exp) var)
+             (make-product
+              (exponent exp)
+              (make-exponentiation (base exp) (make-sum (exponent exp) (- 1))))
+             0))
+
+  (define (tag x) (attach '** x))
+  (put 'deriv '(**) deriv-exp)
+  (put 'make-exponentiation '**
+       (lambda (x y) (tag (make-exponentiation x y))))
   'done)
