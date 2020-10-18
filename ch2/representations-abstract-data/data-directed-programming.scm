@@ -196,3 +196,8 @@
   (put 'make-exponentiation '**
        (lambda (x y) (tag (make-exponentiation x y))))
   'done)
+
+;; d: Suppose we indexed deriv procs such that ((get (operator exp) 'deriv) (operands exp) var) was our
+;;    get proc, how would that affect our above implementation of packages?
+
+;; It would require we tagged and indexed each package's internal procs within our put procs in reverse
