@@ -216,5 +216,10 @@
 (define (get-record key file)
   (if (eq? (car file) key) (cadr file) ;; k, v pairs look like '(address (182 Hampton St)) or '(salary 189000)
       (get-record key (cdr file))))
-      
+
+
+;; b: Implement a get-salary procedure. How should files be structured?
+;; We can implement a get-salary procedure as a specific case of our get-record and get-employee procs
+(define (get-salary name files)
+  (get-record 'salary (get-employee name files)))
       
