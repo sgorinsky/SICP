@@ -222,4 +222,8 @@
 ;; We can implement a get-salary procedure as a specific case of our get-record and get-employee procs
 (define (get-salary name files)
   (get-record 'salary (get-employee name files)))
-      
+
+;; c: Implement find-employee-record
+;; We already did this in part a but we can just repurpose our get-employee proc
+(define find-employee-record
+  (lambda (name files) (get-employee name files)))
