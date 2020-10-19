@@ -201,3 +201,20 @@
 ;;    get proc, how would that affect our above implementation of packages?
 
 ;; It would require we tagged and indexed each package's internal procs within our put procs in reverse
+
+;; 3.74: We have a file-structure with employee information keyed under 'address' and 'salary'
+;; a: Implement a get-record proc that is applicable to any division file; also explain how each division's
+;;    files should be structured
+
+;; Each division's files should be a list of lists, where each list in the division represents an employee
+;; Should we want to get a particular employee's record, we have to find them by name
+;; Maybe something like '((Sam (address (182 Hampton St)) (salary 189000)) ...)
+(define (get-employee name files) ;; we will iterate through the employee and check against key
+  (if (eq? (caar files) name) (cdar files)
+      (get-employee name (cdr files))))
+
+(define (get-record key file)
+  (if (eq? (car file) key) (cadr file) ;; k, v pairs look like '(address (182 Hampton St)) or '(salary 189000)
+      (get-record key (cdr file))))
+      
+      
