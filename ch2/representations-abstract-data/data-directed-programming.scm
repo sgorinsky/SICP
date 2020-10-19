@@ -227,3 +227,9 @@
 ;; We already did this in part a but we can just repurpose our get-employee proc
 (define find-employee-record
   (lambda (name files) (get-employee name files)))
+
+;; d: When the Insatiable company takes over a new company, how must new employees be assimilated into existing
+;;    file structure?
+
+;; They must follow format of name as car of employee record for find-employee-record proc, and each bit of
+;; info must be associated with a given key where the key is the car of the list and the value is the cadr
