@@ -243,3 +243,17 @@
           ((eq? op 'imag-part) (* x (sin y)))
           (else (error "Unknown op MAKE_FROM_MAG_ANG: " op))))
   dispatch)
+
+;; 3.76: Describe differences between generic operations w/ explicit dispatch vs data-directed vs message-passing
+;;       Which style would be most appropriate for a new system in which new operations are often added?
+
+;; For generic operations, we build up modules that have an explicit type associated with them to call procs.
+;    Though procs in different modules, if used in the same environment, can't be named the same.
+;; Data-directed modularizes even further and puts and gets procs in and from a table associated with module
+;; Message-passing evokes certain behavior from a procedure via the message passed to it, dispatching
+;    procedures on a given operation.
+
+;; In a system where new operations are being added, data-directed may be best since it directly deals with
+;;    adding a new operation for each procedure, modularizing system design.
+;; Message-passing requires that new types have dispatch procedures that implement its operations. When a new
+;;    operation is added in this case, the dispatch procedure must also be modified to accommodate the new operations
