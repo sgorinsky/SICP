@@ -233,3 +233,13 @@
 
 ;; They must follow format of name as car of employee record for find-employee-record proc, and each bit of
 ;; info must be associated with a given key where the key is the car of the list and the value is the cadr
+
+;; 3.75: Implement make-from-mag-ang in message passing style
+(define (make-from-mag-ang x y)
+  (define (dispatch op)
+    (cond ((eq? op 'magnitude) x)
+          ((eq? op 'angle) y)
+          ((eq? op 'real-part) (* x (cos y)))
+          ((eq? op 'imag-part) (* x (sin y)))
+          (else (error "Unknown op MAKE_FROM_MAG_ANG: " op))))
+  dispatch)
