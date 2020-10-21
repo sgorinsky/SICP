@@ -257,3 +257,22 @@
 ;;    adding a new operation for each procedure, modularizing system design.
 ;; Message-passing requires that new types have dispatch procedures that implement its operations. When a new
 ;;    operation is added in this case, the dispatch procedure must also be modified to accommodate the new operations
+
+;; 2.5.1 Generic Arithmetic Operators
+(define (add x y) (apply-generic 'add x y))
+(define (sub x y) (apply-generic 'sub x y))
+(define (mul x y) (apply-generic 'mul x y))
+(define (div x y) (apply-generic 'div x y))
+
+;; Package for handling ordinary numbers
+(define (install-scheme-number-package)
+  (define (tag x) (attach-tag 'scheme-number x))
+  (put 'add '(scheme-number scheme-number)
+       (lambda (x y) (tag (+ x y))))
+  (put 'sub '(scheme-number scheme-number)
+       (lambda (x y) (tag (- x y))))
+  (put 'mul '(scheme-number scheme-number)
+       (lambda (x y) (tag (* x y))))
+  (put 'div '(scheme-number scheme-number)
+       (lambda (x y) (tag (/ x y))))
+  (put 'make 'scheme-number (lambda (x) (tag x))) 'done)
