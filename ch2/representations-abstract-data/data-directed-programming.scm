@@ -276,3 +276,7 @@
   (put 'div '(scheme-number scheme-number)
        (lambda (x y) (tag (/ x y))))
   (put 'make 'scheme-number (lambda (x) (tag x))) 'done)
+
+;; Users of scheme-number package will create (tagged) ordinary numbers:
+(define (make-scheme-number n)
+  ((get 'make 'scheme-number) n))
