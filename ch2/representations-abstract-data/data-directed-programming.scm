@@ -365,4 +365,9 @@
   ((get 'make-from-mag-ang 'complex) r a))
 
 ;; 2.77: apply-generic throws error no method magnitude on types (complex) when evaluating (magnitude z). Why?
-; No '(complex) tag had been applied
+; Those procs from rectangular and polar packages hadn't been put in complex package.
+; apply-generic finds type-tags from given operation and applies the relevant proc as the tag is found
+; recall that we have a table or pkg with our procs already defined and apply-generic helps a newly-named proc
+;    check table to find which operation in the table to use
+; apply-generic therefore is invoked twice here: to call the complex package and the rectangle pkg
+;    associated with magnitude
