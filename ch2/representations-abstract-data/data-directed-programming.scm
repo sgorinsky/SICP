@@ -363,3 +363,6 @@
   ((get 'make-from-real-imag 'complex) x y))
 (define (make-complex-from-mag-ang r a)
   ((get 'make-from-mag-ang 'complex) r a))
+
+;; 2.77: apply-generic throws error no method magnitude on types (complex) when evaluating (magnitude z). Why?
+; No '(complex) tag had been applied
