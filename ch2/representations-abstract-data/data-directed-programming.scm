@@ -202,7 +202,7 @@
 
 ;; It would require we tagged and indexed each package's internal procs within our put procs in reverse
 
-;; 3.74: We have a file-structure with employee information keyed under 'address' and 'salary'
+;; 2.74: We have a file-structure with employee information keyed under 'address' and 'salary'
 ;; a: Implement a get-record proc that is applicable to any division file; also explain how each division's
 ;;    files should be structured
 
@@ -234,7 +234,7 @@
 ;; They must follow format of name as car of employee record for find-employee-record proc, and each bit of
 ;; info must be associated with a given key where the key is the car of the list and the value is the cadr
 
-;; 3.75: Implement make-from-mag-ang in message passing style
+;; 2.75: Implement make-from-mag-ang in message passing style
 (define (make-from-mag-ang x y)
   (define (dispatch op)
     (cond ((eq? op 'magnitude) x)
@@ -244,7 +244,7 @@
           (else (error "Unknown op MAKE_FROM_MAG_ANG: " op))))
   dispatch)
 
-;; 3.76: Describe differences between generic operations w/ explicit dispatch vs data-directed vs message-passing
+;; 2.76: Describe differences between generic operations w/ explicit dispatch vs data-directed vs message-passing
 ;;       Which style would be most appropriate for a new system in which new operations are often added?
 
 ;; For generic operations, we build up modules that have an explicit type associated with them to call procs.
