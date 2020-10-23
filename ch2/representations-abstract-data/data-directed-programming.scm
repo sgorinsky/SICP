@@ -371,3 +371,18 @@
 ;    check table to find which operation in the table to use
 ; apply-generic therefore is invoked twice here: to call the complex package and the rectangle pkg
 ;    associated with magnitude
+
+;; 2.78: Modify attach-tag, type-tag, and contents to represent numbers using scheme's internal type system
+(define (attach-tag type-tag contents)
+  (if (number? contents) contents
+      (cons type-tag contents)))
+
+(define (type-tag datum)
+  (cond ((number? datum) 'scheme-number)
+        ((pair? datum) (car datum))
+        (else (error "Bad tagged datum: TYPE-TAG" datum))))
+
+(define (contents datum)
+  (cond ((number? datum) datum)
+        ((pair? datum) (cdr datum))
+        (else (error "Bad tagged datum: CONTENTS" datum))))
