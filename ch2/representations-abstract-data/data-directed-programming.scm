@@ -411,12 +411,12 @@
   (put 'equ? '(complex complex) equ?) 
   'done) 
 
- (define (install-rectangular-package) 
-   ;; ... 
-   (put 'equ? '(rectangular rectangular) 
-        (lambda (x y) (and (= (real-part x) (real-part y)) 
-                           (= (imag-part x) (imag-part y))))) 
-   'done) 
+(define (install-rectangular-package) 
+  ;; ... 
+  (put 'equ? '(rectangular rectangular) 
+       (lambda (x y) (and (= (real-part x) (real-part y)) 
+                          (= (imag-part x) (imag-part y))))) 
+  'done) 
   
 (define (install-polar-package) 
   ;; ... 
@@ -434,3 +434,41 @@
 
 (define (equ? x y) (apply-generic 'equ? x y)) 
 
+
+;; 2.80: Define an =zero? generic predicate
+(define (install-scheme-number-package)
+  ;; ...
+  (define (=zero? n)
+    (= n 0))
+
+  (put '=zero? '(scheme-number scheme-number) =zero?)
+  done)
+
+(define (install-rational-package)
+  ;; ...
+  (define (=zero? a b)
+    (= a 0))
+
+  (put '=zero? '(rational rational) =zero?)
+  done)
+
+
+(define (install-rational-package)
+  ;; ...
+  (define (=zero? n)
+    (= (numer n) 0))
+
+  (put '=zero? '(rational rational) =zero?)
+  done)
+
+
+(define (install-complex-package)
+  ;; ...
+  (define (=zero? z)
+    (or (= (mag z) 0) (and (= 0 (real-part z)) (= 0 (imag-part z)))))
+
+  (put '=zero? '(complex complex) =zero?)
+  done)
+
+(define (=zero? n) (apply-generic '=zero? n))
+  
