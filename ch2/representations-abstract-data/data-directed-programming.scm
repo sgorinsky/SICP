@@ -471,4 +471,36 @@
   done)
 
 (define (=zero? n) (apply-generic '=zero? n))
+
+;; 2.81
+
+; a: If apply-generic is called with two args of type scheme-number or two args of type complex, since his procs
+;    coerce types into themselves, it will recursively coerces itself forever
+
+; b: apply-generic needs to avoid coercing args of the same type
+
+; c: refactor apply-generic to not coerce args of same type
+(define (apply-generic op . args)
   
+  (define (signal-error type-tags)
+    (error "No method for these types - APPLY-GENERIC"
+           (list op type-tags)))
+  
+  (define (coerce-types tags args)
+    (let ((type1 (car tags))
+          (type2 (cadr tags))
+          (a1 (car args))
+          (a2 (cadr args)))
+      (if (eq? type1 type2)
+          (signal-error tags)
+          (let ((t1->t2 (get-coercion type1 type2))
+                (t2->t1 (get-coercion type2 type1)))
+            (cond (t1->t2 (apply-generic op (t1->t2 a1) a2))
+                  (t2->t1 (apply-generic op a1 (t2->t1 a2)))
+                  (else (signal-error tags)))))))
+  
+  (let* ((type-tags (map type-tag args))
+         (proc (get op type-tags)))
+    (cond  (proc (apply proc (map contents args)))
+           ((= (length args) 2) (coerce-types type-tags args))
+           (else (signal-error type-tags)))))
