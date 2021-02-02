@@ -4,18 +4,7 @@
   (cons (- (car end-segment) (car start-segment))
         (- (cdr end-segment) (cdr start-segment))))
 
-(define (make-point x y)
-  (cons x y))
 
-(define (x-point z) (car z))
-(define (y-point z) (cdr z))
-
-(define (print-point p) (newline)
-  (display "(")
-  (display (x-point p))
-  (display ",")
-  (display (y-point p))
-  (display ")"))
 
 (define square (lambda (y) (* y y)))
 (define (rect a b c d)
