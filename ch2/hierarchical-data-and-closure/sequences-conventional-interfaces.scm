@@ -317,3 +317,18 @@
 
 (newline)
 (display (list "Ordered quartet up to 5:" (ordered-quartet 5)))
+
+;; merge k sorted lists
+(define (merge a b)
+  (cond ((null? a) b)
+        ((null? b) a)
+        ((< (car a) (car b)) (cons (car a) (merge (cdr a) b)))
+        (else (cons (car b) (merge (cdr b) a)))))
+
+(define (merge-k-lists lists)
+  (accumulate merge '() lists))
+
+(define a-lists (list a a a a a a))
+
+(newline)
+(display (list "Combine 5 lists of (1 2 3 4 5): " (merge-k-lists a-lists)))

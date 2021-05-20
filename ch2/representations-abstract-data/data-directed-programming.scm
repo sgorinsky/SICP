@@ -235,14 +235,23 @@
 ;; info must be associated with a given key where the key is the car of the list and the value is the cadr
 
 ;; 2.75: Implement make-from-mag-ang in message passing style
-(define (make-from-mag-ang x y)
+(define (make-from-mag-ang-dispatch r theta)
   (define (dispatch op)
-    (cond ((eq? op 'magnitude) x)
-          ((eq? op 'angle) y)
-          ((eq? op 'real-part) (* x (cos y)))
-          ((eq? op 'imag-part) (* x (sin y)))
+    (cond ((eq? op 'magnitude) r)
+          ((eq? op 'angle) theta)
+          ((eq? op 'real-part) (* r (cos theta)))
+          ((eq? op 'imag-part) (* r (sin theta)))
           (else (error "Unknown op MAKE_FROM_MAG_ANG: " op))))
   dispatch)
+
+; We can also implement the dispatch procedure as a lambda function
+(define (make-from-mag-ang-lambda r theta)
+  (lambda (op)
+    (cond ((eq? op 'magnitude) r)
+          ((eq? op 'angle) theta)
+          ((eq? op 'real-part) (* r (cos theta)))
+          ((eq? op 'imag-part) (* r (sin theta)))
+          (else (error "Unknown op MAKE_FROM_MAG_ANG: " op)))))
 
 ;; 2.76: Describe differences between generic operations w/ explicit dispatch vs data-directed vs message-passing
 ;;       Which style would be most appropriate for a new system in which new operations are often added?
