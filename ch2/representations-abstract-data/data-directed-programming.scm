@@ -381,13 +381,42 @@
 ; apply-generic therefore is invoked twice here: to call the complex package and the rectangle pkg
 ;    associated with magnitude
 
+;; So we want to run magnitude on 3 + 4i -> '(complex rectangular (3 4))
+(define 3-plus-4i '(complex rectangular 3 . 4))
+
+;; RECALL:
+(define (apply-generic op . args)
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (apply proc (map contents args))
+          (error
+            "No method for these types -- APPLY-GENERIC"
+            (list op type-tags))))))
+
+;; Stack trace for (magnitude 3-plus-4i) looks like...
+(apply-generic 'magnitude 3-plus-4i) ;; First apply-generic for 'complex tag
+(apply (get op (map (car 3-plus-4i) 3-plus-4i)) (map contents 3-plus-4i)) ;; only one arg so we map type-tag extraction proc (car args) to one element list
+(apply (get 'magnitude ('complex)) '(rectangular 3 . 4)) ;; top-level lookup yields generic magnitude proc
+(magnitude '(rectangular 3 . 4))
+(apply-generic 'magnitude '(rectangular 3 . 4)) ;; Second apply-generic for 'rectangular tag
+(apply (get 'magnitude ('rectangular)) (contents '(rectangular 3 . 4)))
+(sqrt (+ (square (real-pt (3 . 4)))
+         (square (imag-pt (3 . 4)))))
+(sqrt (+ (square (car (3 . 4)))
+         (square (cdr (3 . 4)))))
+(sqrt (+ 9 16))
+5 ;; Correct
+
 ;; 2.78: Modify attach-tag, type-tag, and contents to represent numbers using scheme's internal type system
 (define (attach-tag type-tag contents)
-  (if (number? contents) contents
-      (cons type-tag contents)))
+  (cond ((number? contents) contents)
+        ((symbol? contents) contents)
+        (else (cons type-tag contents))))
 
 (define (type-tag datum)
   (cond ((number? datum) 'scheme-number)
+        ((symbol? dataum) 'symbol)
         ((pair? datum) (car datum))
         (else (error "Bad tagged datum: TYPE-TAG" datum))))
 
