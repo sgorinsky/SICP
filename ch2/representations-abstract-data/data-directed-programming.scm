@@ -503,7 +503,7 @@
 (define (install-complex-package)
   ;; ...
   (define (=zero? z)
-    (or (= (mag z) 0) (and (= 0 (real-part z)) (= 0 (imag-part z)))))
+    (and (= 0 (real-part z)) (= 0 (imag-part z)))))
 
   (put '=zero? '(complex complex) =zero?)
   done)
