@@ -14,9 +14,11 @@
 (define (right-branch tree) (cadr tree))
 (define (symbols tree)
   (if (leaf? tree)
-      (list (symbol-leaf tree)) (caddr tree)))
-(define (weight tree) (if (leaf? tree)
-(weight-leaf tree) (cadddr tree)))
+      (list (symbol-leaf tree))
+      (caddr tree)))
+(define (weight tree)
+  (if (leaf? tree)
+      (weight-leaf tree) (cadddr tree)))
 
 ;; Union of two sets at two given nodes
 (define (make-code-tree left right)
@@ -60,7 +62,10 @@
                    (make-code-tree
                     (make-leaf 'D 1)
                     (make-leaf 'C 1)))))
-
+;;  /  \ 
+;; A  /  \ 
+;;   B  /  \
+;;     D    C
 (define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
 
 (displayln (list "decoding sample-message with sample-tree:" (decode sample-message sample-tree)))
@@ -68,15 +73,20 @@
 ;; 2.68: Write encode-symbol, a proc to encode the encoding-tree traversals according
 ;;       to the following encode proc
 
+;; Trees have structure:
+;;         /              |              \
+;; (leaf, sym, wt)  rest-of-tree     symbol-set
 (define (symbol-set tree)
   (caddr tree))
 
 (define (encode-symbol symbol tree)
   (let ((symbols (symbol-set tree)))
-    (cond ((or (null? symbols) (null? (cdr symbols))) '())
-          ((and (= 2 (length symbols)) (eq? symbol (cadr symbols))) (list 1))
-          ((eq? symbol (car symbols)) (list 0))
-          (else (cons 1 (encode-symbol symbol (right-branch tree)))))))
+    (define (enc-sym set)
+      (cond ((or (null? set) (null? (cdr set))) '())
+            ((eq? symbol (car set)) (list 0))
+            (else (cons 1 (enc-sym (cdr set))))))
+    (enc-sym symbols)))
+    
 
 (define (encode message tree)
   (if (null? message) '()
