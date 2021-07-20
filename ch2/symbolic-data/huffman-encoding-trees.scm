@@ -153,8 +153,7 @@
 ;;    the most frequent symbol.
 ;; For the least frequent symbol, log(2^(n-1)) bits.
 
-;; 2.72: Order of growth in encode-symbol proc generally and for special case of
-;;       n symbols with 1...2^(n-1) frequencies
+;; 2.72: Order of growth in encode-symbol proc is O(N)
 
 ;; Since we use a weighted tree, there are about n/2 levels
 ;;    In the worst case, we encode a message that takes n/2 time for a message of length
