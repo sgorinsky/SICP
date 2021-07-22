@@ -4,10 +4,12 @@
   (cons left right))
 
 (define (datum tree)
-  (car tree))
+  (if (not (pair? tree)) tree
+      (car tree)))
 
 (define (children tree)
-  (cdr tree))
+  (if (not (pair? tree)) '()
+      (cdr tree)))
 
 ;; map-like procedure for trees where each node of tree has a datum
 (define (tree-map fn tree)
@@ -36,4 +38,21 @@
       (map (lambda (element) (deep-map fn element)) lsts)))
 
 (deep-map (lambda (name) 'beatles) beatles)
-  
+
+
+(define (dfs fn tree)
+  (cond ((null? tree) '())
+        ((not (pair? tree)) (fn tree))
+        (else (cons (dfs fn (car tree)) (dfs fn (cdr tree))))))
+
+(dfs (lambda (node) node) tree)
+
+(define (bfs fn tree)
+  (define (bfs-iter q)
+    (if (null? q) '()
+        (let ((task (car q)))
+          (cons (fn (datum task))
+                (bfs-iter (append (cdr q) (children task)))))))
+  (bfs-iter tree))
+
+(bfs (lambda (node) node) tree)
