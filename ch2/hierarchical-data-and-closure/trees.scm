@@ -42,10 +42,12 @@
 
 (define (dfs fn tree)
   (cond ((null? tree) '())
-        ((not (pair? tree)) (fn tree))
-        (else (cons (dfs fn (car tree)) (dfs fn (cdr tree))))))
+        ((not (pair? tree)) (list (fn tree)))
+        (else (append (dfs fn (car tree)) (dfs fn (cdr tree))))))
 
+tree
 (dfs (lambda (node) node) tree)
+(dfs square tree)
 
 (define (bfs fn tree)
   (define (bfs-iter q)
@@ -56,3 +58,4 @@
   (bfs-iter tree))
 
 (bfs (lambda (node) node) tree)
+(bfs square tree)
