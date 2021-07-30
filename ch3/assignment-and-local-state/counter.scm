@@ -1,5 +1,11 @@
 #lang scheme
 
+(define count
+  (let ((result 0))
+    (lambda ()
+      (set! result (+ result 1))
+      result)))
+
 ;; create some procedure that manages some internal state of proc instantiations
 (define counter
   (let ((count 0))
@@ -39,4 +45,4 @@
                     ((eq? message 'add-class)
                      (set! class-count (+ class-count 1))
                      (list count class-count))
-                    (else (error "No proc for type message")))))))))
+                    (else (error "No proc for type message")))))))))       
