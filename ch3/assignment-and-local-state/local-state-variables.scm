@@ -36,8 +36,9 @@
 (sq-mon 'how-many-calls)
 
 ;; 3.3: Modify make-account so that it creates password protected accounts
+;; 3.4: Include local variable that "calls-cops" if an account is accessed more than 7 times with an incorrect password
 (define (make-account balance password)
-  (let ((secret password))
+  (let ((secret password) (accesses 0))
     (define (withdraw amount)
       (if (>= balance amount)
           (begin (set! balance (- balance amount)) balance)
@@ -45,17 +46,30 @@
     (define (deposit amount)
       (set! balance (+ balance amount))
       balance)
+    (define call-the-cops
+      "Calling the cops")
     (define (dispatch m)
       (cond ((eq? m 'withdraw) withdraw)
             ((eq? m 'deposit) deposit)
             (else (error "Unknown request: MAKE-ACCOUNT" m))))
     (lambda (pass m)
-      (if (not (eq? pass secret))
-          (lambda args "Incorrect password") ; This clause expects to return a procedure
-          (dispatch m)))))
+        (if (not (eq? pass secret))
+            (begin (set! accesses (+ accesses 1))
+                   (lambda args
+                     (if (> accesses 7)
+                         call-the-cops
+                         "Incorrect password")))
+            (dispatch m)))))
 
 (define acc (make-account 100 'secret))
 ((acc 'secret 'withdraw) 40)
 ((acc 'secret 'withdraw) 40)
 ((acc 'secret 'withdraw) 40)
+((acc 'wrong-secret 'withdraw) 40)
+((acc 'wrong-secret 'withdraw) 40)
+((acc 'wrong-secret 'withdraw) 40)
+((acc 'wrong-secret 'withdraw) 40)
+((acc 'wrong-secret 'withdraw) 40)
+((acc 'wrong-secret 'withdraw) 40)
+((acc 'wrong-secret 'withdraw) 40)
 ((acc 'wrong-secret 'withdraw) 40)
