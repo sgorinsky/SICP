@@ -92,3 +92,17 @@
 (define acc2 (make-joint acc 'secret 'new-secret))
 ((acc2 'new-secret 'withdraw) 5)
 ((acc2 'secret 'deposit) 100) ;; is it a bug to be able to access the joint account with the other password?
+
+;; 3.8: Define a proc f such that evaluating (+ (f 0) (f 1)) left-right returns 0 and right-left returns 1
+(define f
+  (lambda ()
+    (let ((count 1))
+      (lambda (x)
+        (set! count (* x count))
+        count))))
+
+(define f1 (f))
+(+ (f1 0) (f1 1)) ;; left-right --> 0
+(define f2 (f))
+(+ (f2 1) (f2 0)) ;; right-left --> 1
+    
