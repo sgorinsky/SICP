@@ -37,8 +37,9 @@
 
 ;; 3.3: Modify make-account so that it creates password protected accounts
 ;; 3.4: Include local variable that "calls-cops" if an account is accessed more than 7 times with an incorrect password
+;; 3.7: Modifying make-account to allow for make-joint below
 (define (make-account balance password)
-  (let ((secret password) (accesses 0))
+  (let ((secrets (list password)) (accesses 0))
     (define (withdraw amount)
       (if (>= balance amount)
           (begin (set! balance (- balance amount)) balance)
@@ -48,12 +49,21 @@
       balance)
     (define call-the-cops
       "Calling the cops")
+    (define (check-password pass)
+      (define (iter passes)
+        (cond ((null? passes) #f)
+              ((eq? (car passes) pass) #t)
+              (else (iter (cdr passes)))))
+      (iter secrets))
+    (define (add-password pass)
+      (set! secrets (append secrets (list pass))))
     (define (dispatch m)
       (cond ((eq? m 'withdraw) withdraw)
             ((eq? m 'deposit) deposit)
+            ((eq? m 'add-password) add-password)
             (else (error "Unknown request: MAKE-ACCOUNT" m))))
     (lambda (pass m)
-        (if (not (eq? pass secret))
+        (if (not (check-password pass))
             (begin (set! accesses (+ accesses 1))
                    (lambda args
                      (if (> accesses 7)
@@ -73,3 +83,12 @@
 ((acc 'wrong-secret 'withdraw) 40)
 ((acc 'wrong-secret 'withdraw) 40)
 ((acc 'wrong-secret 'withdraw) 40)
+
+
+;; 3.7: Introduce make-joint account which allows for joint accounts with more than one password
+(define (make-joint account original-password new-password)
+  (begin ((account original-password 'add-password) new-password) account))
+
+(define acc2 (make-joint acc 'secret 'new-secret))
+((acc2 'new-secret 'withdraw) 5)
+((acc2 'secret 'deposit) 100) ;; is it a bug to be able to access the joint account with the other password?
