@@ -59,3 +59,56 @@
 
 (set-to-wow! z1) ; modifies (caar z1) which is a reference to x-mut so x-mut is modified as well
 x-mut
+
+;; 3.16: Why is count-pairs proc below wrong? Make 3 pairs where proc
+;;       return 3, 4, 7, and doesn't return anything at all
+
+;; wrong b/c it assumes list is pair of nums
+;; if car isn't atom, makes recursive call and adds one erroneously
+(define (count-pairs x)
+  (if (not (pair? x))
+      0
+      (+ (count-pairs (car x))
+         (count-pairs (cdr x)) 1)))
+
+; 3
+(count-pairs (list 'a 'b 'c))
+; -> [   ][   ] -> [   ][   ] -> [   ][ / ]
+;      |             |             |
+;      v             v             v
+;      a             b             c
+; 4
+(define a '(foo))
+(count-pairs (list (cons a a)))
+; -> [   ][ / ]
+;      |    
+;      v
+;    [   ][ / ]
+;      |    |
+;      v    v ; points to a, not cdr a
+;    [   ][ / ]
+;      |
+;      v
+;     foo
+
+
+; 7
+(define y (cons a a))
+(count-pairs (cons y y))
+; -> [   ][   ]
+;      |    |
+;      v    v
+;    [   ][   ]
+;      |    |
+;      v    v
+;    [   ][ / ]
+;      |
+;      v
+;     foo
+
+
+; infinite loop
+;; (set-mcdr! (mlast-pair? mlist) (mcar mlist))
+;; (count-pairs mlist)
+
+;; 3.17: Devise correct count-pairs
