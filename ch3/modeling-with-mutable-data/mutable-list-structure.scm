@@ -5,17 +5,27 @@
         ((null? (mcdr mlist)) mlist)
         (else (mlast-pair (mcdr mlist)))))
 
+; mutable list structure
+(define (mlist . lst)
+  (define (helper hlst)
+    (if (null? hlst) hlst
+        (mcons
+         (car hlst)
+         (helper (cdr hlst)))))
+  (helper lst))
+
 ;; basic example of mutating cdr of 
-(define x-mut (mcons 'a (mcons 'b null))) ; {a b}
-(define y-mut (mcons 'c (mcons 'd null))) ; {c d}
+(define x-mut (mcons 'a (mcons 'b '{}))) ; {a b}
+(define y-mut (mlist 'c 'd)) ; {c d}
 
 ; proc mutates cdr of last-pair to point to l2
 (define (append! mut-l1 mut-l2)
-  (set-mcdr! (mlast-pair mut-l1) mut-l2)) 
+  (set-mcdr!
+   (mlast-pair mut-l1)
+   (if (mpair? mut-l2) mut-l2 (mlist mut-l2)))
+  mut-l1)
 
-(begin
-  (append! x-mut y-mut)
-  x-mut) ; {a b c d}
+(append! x-mut y-mut) ; {a b c d}
 
 ;; 3.12: Suppose append! is defined below: explain what happens in <response> from following proc calls
 ; Note: instead of running procs, will just analyze
@@ -77,6 +87,7 @@ x-mut
 ;      |             |             |
 ;      v             v             v
 ;      a             b             c
+
 ; 4
 (define a '(foo))
 (count-pairs (list (cons a a)))
@@ -91,10 +102,9 @@ x-mut
 ;      v
 ;     foo
 
-
 ; 7
-(define y (cons a a))
-(count-pairs (cons y y))
+(define b (cons a a))
+(count-pairs (cons b b))
 ; -> [   ][   ]
 ;      |    |
 ;      v    v
@@ -112,3 +122,14 @@ x-mut
 ;; (count-pairs mlist)
 
 ;; 3.17: Devise correct count-pairs
+;(define (count-pairs-correct l)
+;  (define (has-seen? entry seen)
+;    (if (or (null? seen) (eq? entry seen)) #t
+;        (has-seen? entry (cdr seen))))
+;  (define (iter lst seen)
+;    (let ((cand (car lst)))
+;      (cond ((null? lst) 0)
+;            ((not (has-seen? cand seen)
+;                  (begin (append! seen cand)
+;                         (+ (iter cand (cons cand seen))
+;                            (iter (cdr lst) (cons cand
