@@ -1,8 +1,25 @@
 #lang scheme
 (require rnrs/mutable-pairs-6)
 
-;; 3.12: Suppose append! is defined below: explain what happens in <response> from following proc calls
+(define (mlast-pair mlist)
+  (cond ((null? mlist) (error "mutable list is null, must have at least 1 element"))
+        ((null? (mcdr mlist)) mlist)
+        (else (mlast-pair (mcdr mlist)))))
 
+;; basic example of mutating cdr of 
+(define x-mut (mcons 'a (mcons 'b null))) ; {a b}
+(define y-mut (mcons 'c (mcons 'd null))) ; {c d}
+
+; proc mutates cdr of last-pair to point to l2
+(define (append! mut-l1 mut-l2)
+  (set-mcdr! (mlast-pair mut-l1) mut-l2)) 
+
+(begin
+  (append! x-mut y-mut)
+  x-mut) ; {a b c d}
+
+;; 3.12: Suppose append! is defined below: explain what happens in <response> from following proc calls
+; Note: instead of running procs, will just analyze
 ;(define (append! x y)
 ;  (set-cdr! (last-pair x) y)
 ;  x)
