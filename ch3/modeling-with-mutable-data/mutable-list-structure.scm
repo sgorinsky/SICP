@@ -1,5 +1,4 @@
 #lang scheme
-(require rnrs/mutable-pairs-6)
 
 (define (mlast-pair mlist)
   (cond ((null? mlist) (error "mutable list is null, must have at least 1 element"))
@@ -50,3 +49,13 @@
 
 ;; mystery proc reverses list by recursively taking first element of x, storing it in y, and mutating
 ;;  cdr x to point to it then calling itself again until x is null
+
+;; 3.15: What does (set-to-wow! z1) look like?
+(define z1 (mcons x-mut x-mut))
+
+(define (set-to-wow! mlist)
+  (set-mcar! (mcar mlist) 'wow)
+  mlist)
+
+(set-to-wow! z1) ; modifies (caar z1) which is a reference to x-mut so x-mut is modified as well
+x-mut
