@@ -129,19 +129,15 @@ x-mut
             ((eq? entry (mcar seen)) #t)
             (else (has-seen? entry (mcdr seen)))))
     (define (iter lst)
-      (cond ((or
-              (null? lst)
-              (not (pair? lst))
-              (symbol? lst))
-             0)
-            ((not (has-seen? (car lst) seen))
+      (cond ((or (null? lst) (not (pair? lst))) 0)
+            ((not (has-seen? lst seen))
              (begin
-               (append! seen (car lst))
+               (append! seen lst)
                (+ (iter (car lst))
                   (iter (cdr lst)) 1)))
             (else
              (+ (iter (cdr lst)) 0))))
     (iter l)))
 
-(count-pairs-correct (list a a a)) ; 2
+(count-pairs-correct (list a a a)) ; 4
 (count-pairs-correct (cons b b)) ; 3
