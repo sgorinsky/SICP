@@ -89,7 +89,7 @@ x-mut
 ;      a             b             c
 
 ; 4
-(define a '(foo))
+(define a (cons 'foo '()))
 (count-pairs (list (cons a a)))
 ; -> [   ][ / ]
 ;      |    
@@ -122,14 +122,26 @@ x-mut
 ;; (count-pairs mlist)
 
 ;; 3.17: Devise correct count-pairs
-;(define (count-pairs-correct l)
-;  (define (has-seen? entry seen)
-;    (if (or (null? seen) (eq? entry seen)) #t
-;        (has-seen? entry (cdr seen))))
-;  (define (iter lst seen)
-;    (let ((cand (car lst)))
-;      (cond ((null? lst) 0)
-;            ((not (has-seen? cand seen)
-;                  (begin (append! seen cand)
-;                         (+ (iter cand (cons cand seen))
-;                            (iter (cdr lst) (cons cand
+(define (count-pairs-correct l)
+  (let ((seen (mlist 'ZZZ)))
+    (define (has-seen? entry seen)
+      (cond ((null? seen) #f)
+            ((eq? entry (mcar seen)) #t)
+            (else (has-seen? entry (mcdr seen)))))
+    (define (iter lst)
+      (cond ((or
+              (null? lst)
+              (not (pair? lst))
+              (symbol? lst))
+             0)
+            ((not (has-seen? (car lst) seen))
+             (begin
+               (append! seen (car lst))
+               (+ (iter (car lst))
+                  (iter (cdr lst)) 1)))
+            (else
+             (+ (iter (cdr lst)) 0))))
+    (iter l)))
+
+(count-pairs-correct (list a a a)) ; 2
+(count-pairs-correct (cons b b)) ; 3
