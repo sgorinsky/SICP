@@ -160,5 +160,16 @@ x-mut
     (append! circ circ)
     circ))
 
-(has-cycle? circular)
+(has-cycle? circular) ; #t
+
 ;; 3.19: Rewrite 3.18 with algo that uses constant space
+(define (detect-cycle? mlst)
+  (define (race ml1 ml2)
+    (cond ((or (null? ml1) (null? (mcdr ml2))) #f)
+          ((eq? ml1 ml2) #t)
+          (else (race (mcdr ml1) (mcdr (mcdr ml2))))))
+  (if (or (null? mlst) (not (mpair? mlst)))
+      #f
+      (race mlst (mcdr mlst))))
+
+(detect-cycle? circular) ; #t
