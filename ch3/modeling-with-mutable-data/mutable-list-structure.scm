@@ -144,15 +144,16 @@ x-mut
 (count-pairs-correct (cons b b)) ; 3
 
 ;; 3.18: Detect cycle in mutable list
-(define has-cycle?
+(define (has-cycle? mutable-list)
   (let ((seen (mlist 'ZZZ)))
-    (lambda (mlst)
+    (define (helper mlst)
       (cond ((or (null? mlst) (not (mpair? mlst))) #f)
             ((has-seen? mlst seen) #t)
             (else (begin
                     (append! seen (mlist mlst))
-                    (or (has-cycle? (mcar mlst))
-                        (has-cycle? (mcdr mlst)))))))))
+                    (or (helper (mcar mlst))
+                        (helper (mcdr mlst)))))))
+    (helper mutable-list)))
 
 (define circular
   (let ((circ (mlist 1 2 3 4)))
@@ -160,4 +161,4 @@ x-mut
     circ))
 
 (has-cycle? circular)
-        
+;; 3.19: Rewrite 3.18 with algo that uses constant space
