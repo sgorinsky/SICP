@@ -22,8 +22,7 @@
 (define (append! mut-l1 mut-l2)
   (set-mcdr!
    (mlast-pair mut-l1)
-   (if (mpair? mut-l2) mut-l2 (mlist mut-l2)))
-  mut-l1)
+   (if (mpair? mut-l2) mut-l2 (mlist mut-l2))))
 
 (append! x-mut y-mut) ; {a b c d}
 
@@ -122,12 +121,14 @@ x-mut
 ;; (count-pairs mlist)
 
 ;; 3.17: Devise correct count-pairs
+
+(define (has-seen? entry seen)
+  (cond ((null? seen) #f)
+        ((eq? entry (mcar seen)) #t)
+        (else (has-seen? entry (mcdr seen)))))
+
 (define (count-pairs-correct l)
   (let ((seen (mlist 'ZZZ)))
-    (define (has-seen? entry seen)
-      (cond ((null? seen) #f)
-            ((eq? entry (mcar seen)) #t)
-            (else (has-seen? entry (mcdr seen)))))
     (define (iter lst)
       (cond ((or (null? lst) (not (pair? lst))) 0)
             ((not (has-seen? lst seen))
@@ -139,5 +140,24 @@ x-mut
              (+ (iter (cdr lst)) 0))))
     (iter l)))
 
-(count-pairs-correct (list a a a)) ; 4
+(count-pairs-correct (list a a)) ; 3
 (count-pairs-correct (cons b b)) ; 3
+
+;; 3.18: Detect cycle in mutable list
+(define has-cycle?
+  (let ((seen (mlist 'ZZZ)))
+    (lambda (mlst)
+      (cond ((or (null? mlst) (not (mpair? mlst))) #f)
+            ((has-seen? mlst seen) #t)
+            (else (begin
+                    (append! seen (mlist mlst))
+                    (or (has-cycle? (mcar mlst))
+                        (has-cycle? (mcdr mlst)))))))))
+
+(define circular
+  (let ((circ (mlist 1 2 3 4)))
+    (append! circ circ)
+    circ))
+
+(has-cycle? circular)
+        
