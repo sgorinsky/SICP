@@ -1,5 +1,6 @@
 #lang scheme
 
+
 (define (mlast-pair mlist)
   (cond ((null? mlist) (error "mutable list is null, must have at least 1 element"))
         ((null? (mcdr mlist)) mlist)
@@ -165,11 +166,57 @@ x-mut
 ;; 3.19: Rewrite 3.18 with algo that uses constant space
 (define (detect-cycle? mlst)
   (define (race ml1 ml2)
-    (cond ((or (null? ml1) (null? (mcdr ml2))) #f)
+    (cond ((or (null? ml1) (not (mpair? ml2))) #f)
           ((eq? ml1 ml2) #t)
           (else (race (mcdr ml1) (mcdr (mcdr ml2))))))
-  (if (or (null? mlst) (not (mpair? mlst)))
+  (if (not (mpair? mlst))
       #f
       (race mlst (mcdr mlst))))
 
 (detect-cycle? circular) ; #t
+
+;; Queues
+(define queue
+  (let ((q (mlist null)))
+    (define front-ptr
+      (mcar q))
+    (define rear-ptr
+      (mcdr q))
+    (define (set-front-ptr! item)
+      (set-mcar! q item))
+    (define (set-rear-ptr! item)
+      (set-mcdr! q item))
+    (define (is-empty?)
+      (null? front-ptr))
+    (define (insert-queue! element)
+      (let ((item (mlist element)))
+        (if (is-empty?)
+            (begin
+              (set! front-ptr item)
+              (set! rear-ptr front-ptr))
+            (begin
+              (set-mcdr! rear-ptr item)
+              (set! rear-ptr item))))) 
+    (define (delete-queue!)
+      (if (is-empty?)
+          (error "Queue is already empty")
+          (set! front-ptr (mcdr front-ptr))))
+    (define (dispatch m)
+      (cond ((eq? m 'peek) (mcar front-ptr))
+            ((eq? m 'back) (mcar rear-ptr))
+            ((eq? m 'poll) (delete-queue!))
+            ((eq? m 'push)
+             (lambda (item) (insert-queue! item)))
+            ((eq? m 'view) front-ptr)
+            (else (error "No method for queue"))))
+    dispatch))
+
+(define q queue)
+((q 'push) 1)
+((q 'push) 2)
+((q 'push) 3)
+(q 'peek)
+(q 'back)
+(q 'poll)
+(q 'peek)
+(q 'back)
