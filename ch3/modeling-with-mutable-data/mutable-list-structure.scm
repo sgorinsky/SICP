@@ -232,4 +232,67 @@ x-mut
 (q 'peek)
 ; (q 'back)
 (q 'poll)
-(q 'peek)
+; (q 'peek) ; error
+
+;; Book's implementation of queue
+(define (front-ptr queue)
+  (mcar queue))
+
+(define (rear-ptr queue)
+  (mcdr queue))
+
+(define (set-front-ptr! queue item)
+  (set-mcar! queue item))
+
+(define (set-rear-ptr! queue item)
+  (set-mcdr! queue item))
+
+(define (empty-queue? queue)
+  (null? (front-ptr queue)))
+
+(define (make-queue)
+  (mcons '() '()))
+
+(define (front-queue queue)
+  (if (empty-queue? queue)
+      (error "FRONT called with an empty queue" queue)
+      (mcar (front-ptr queue))))
+
+(define (insert-queue! queue item)
+  (let ((new-pair (mcons item '())))
+    (cond ((empty-queue? queue)
+           (set-front-ptr! queue new-pair) (set-rear-ptr! queue new-pair) queue)
+          (else
+           (set-mcdr! (rear-ptr queue) new-pair) (set-rear-ptr! queue new-pair) queue))))
+
+
+(define (delete-queue! queue)
+  (cond ((empty-queue? queue) (error "DELETE! called with an empty queue" queue))
+        (else (set-front-ptr! queue (mcdr (front-ptr queue))) queue)))
+
+;; 3.21: Why would we have to define own print proc to represent queue to scheme interpreter?
+
+(define q1 (make-queue))
+(insert-queue! q1 'a)
+;((a) a)
+(insert-queue! q1 'b)
+;((a b) b)
+(delete-queue! q1)
+;((b) b)
+(delete-queue! q1)
+;(() b)
+
+;; Interpreter's response looks like item is inserted twice b/c front-ptr references entire list and rear-ptr
+;;    references last element, so insertion shows new element at end of front-ptr and car of rear-ptr.
+;; And the reason why even the b element "stays" after we "delete" it is b/c we don't actually move rear-ptr
+;;     away from it, only the null ptr. Rear-ptr will be readjusted after new insertion.  
+
+(insert-queue! q1 'a)
+(insert-queue! q1 'c)
+
+;; In order to view queue the way Ben Bitdiddle wants, new proc print-queue shows only queue from front-ptr
+(define (print-queue queue)
+  (front-ptr queue))
+
+(print-queue q1)
+
