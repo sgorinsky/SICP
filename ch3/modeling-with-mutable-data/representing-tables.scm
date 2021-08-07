@@ -26,14 +26,29 @@
 
 ;; Tables
 (define (make-table)
-  (mcons 'table null))
+  (mcons '*table* null))
 
 (define (entry pair)
   (mcar pair))
 
 (define (lookup key table)
   (if (null? table) #f
-      (let ((pair (mcar table)))
-        (if (eq? key (entry pair))
-            pair
-            (lookup key (mcdr table))))))
+      (let ((record (massoc key (mcdr table))))
+        (if record
+            (mcdr record)
+            #f))))
+
+(define t (make-table))
+(lookup 'table t)
+
+(define (insert! key value table)
+  (let ((record (massoc key (mcdr table))))
+    (if record
+        (set-mcdr! record value)
+        (let ((new-entry (mlist (mcons key value))))
+          (set-mcdr! new-entry (mcdr table))
+          (set-mcdr! table new-entry)))))
+
+;(insert! 'a 1 t)
+;(insert! 'a 3 t)
+;(insert! 'b 10 t)
