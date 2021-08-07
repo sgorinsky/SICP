@@ -354,6 +354,9 @@ x-mut
 ;; 3.23: Implement double-ended-queue deque w/ insertion and deletion at each end
 (define (deque)
   (let ((front-ptr '()) (rear-ptr '()))
+    
+    (define (get-element ptr)
+      (mcar (mcar ptr)))
     (define (next-ptr ptr)
       (mcdr ptr))
     (define (prev-ptr ptr)
@@ -363,6 +366,7 @@ x-mut
       (set! front-ptr item))
     (define (set-rear-ptr! item)
       (set! rear-ptr item))
+
     (define (set-next-ptr! ptr item)
         (set-mcdr! ptr item))
     (define (set-prev-ptr! ptr item)
@@ -382,19 +386,17 @@ x-mut
       (if (empty-deque?)
           (error "Deque is empty")
           (mcar (mcar rear-ptr))))
-    (define (get-element ptr)
-      (mcar (mcar ptr)))
     
     (define (front-insert-deque! element)
-      (let ((item (mlist (mcons element '()))))
+      (let ((item (mcons (mcons element '()) front-ptr)))
         (if (empty-deque?)
             (begin
               (set-front-ptr! item)
               (set-rear-ptr! front-ptr))
             (begin
-              (set-next-ptr! item front-ptr)
               (set-prev-ptr! front-ptr item)
               (set-front-ptr! item)))))
+
     (define (rear-insert-deque! element)
       (let ((item (mlist (mcons element rear-ptr))))
         (if (empty-deque?)
@@ -402,7 +404,7 @@ x-mut
               (set-front-ptr! item)
               (set-rear-ptr! front-ptr))
             (begin
-              (set-mcdr! rear-ptr item)
+              (set-next-ptr! rear-ptr item)
               (set-rear-ptr! (mcdr rear-ptr))))))
  
 
@@ -422,7 +424,6 @@ x-mut
                     (set-rear-ptr! (prev-ptr rear-ptr))
                     (and (not (empty-deque?)) (set-next-ptr! rear-ptr null))))))
       
-          
     (define (pretty-print-deque)
       (define (print ptr)
           (if (null? ptr) '()
@@ -430,7 +431,6 @@ x-mut
                (get-element ptr)
                (print (next-ptr ptr)))))
         (print front-ptr))
-
     (define (ugly-print-deque)
       front-ptr)
     
