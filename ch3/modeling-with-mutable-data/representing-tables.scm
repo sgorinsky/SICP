@@ -45,9 +45,8 @@
   (let ((record (massoc key (mcdr table))))
     (if record
         (set-mcdr! record value)
-        (let ((new-entry (mlist (mcons key value))))
-          (set-mcdr! new-entry (mcdr table))
-          (set-mcdr! table new-entry)))))
+        (let ((new-entry (mcons key value)))
+          (set-mcdr! table (mcons new-entry (mcdr table)))))))
 
 ; (insert! 'a 1 t)
 ; (insert! 'a 3 t)
@@ -70,11 +69,9 @@
           (if record
               (set-mcdr! record val)
               (let ((new-record (mlist (mcons k2 val))))
-                (set-mcdr! new-record (mcdr subtable))
-                (set-mcdr! subtable new-record))))
+                (set-mcdr! subtable (mcons new-record (mcdr subtable))))))
         (let ((new-subtable (mlist (mlist k1))))
-          (set-mcdr! new-subtable (mcdr table))
-          (set-mcdr! table new-subtable)
+          (set-mcdr! table (mcons new-subtable (mcdr table)))
           (let ((new-record (mlist (mcons k2 val))))
             (set-mcdr! (mcar new-subtable) new-record))))))
           
