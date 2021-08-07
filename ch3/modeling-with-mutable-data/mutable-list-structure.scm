@@ -302,7 +302,7 @@ x-mut
 (delete-queue! q2)
 (print-queue q2)
 
-;; 3.23: Implement queue as object with local state -- answer above in my original queue implementation
+;; 3.22: Implement queue as object with local state -- answer above in my original queue implementation
 ;;       but will tighten things up by defining front-ptr and rear-ptr
 (define (instantiate-queue)
   (let ((front-ptr '()) (rear-ptr '()))
@@ -350,3 +350,111 @@ x-mut
 (iq 'delete)
 (iq 'delete)
 (iq 'delete)
+
+;; 3.23: Implement double-ended-queue deque w/ insertion and deletion at each end
+(define (deque)
+  (let ((front-ptr '()) (rear-ptr '()))
+    (define (next-ptr ptr)
+      (mcdr ptr))
+    (define (prev-ptr ptr)
+      (mcdr (mcar ptr)))
+    
+    (define (set-front-ptr! item)
+      (set! front-ptr item))
+    (define (set-rear-ptr! item)
+      (set! rear-ptr item))
+    (define (set-next-ptr! ptr item)
+        (set-mcdr! ptr item))
+    (define (set-prev-ptr! ptr item)
+      (let ((ptr-pair (mcar ptr)))
+        (set-mcdr! ptr-pair item)))
+    
+    (define (empty-deque?)
+      (if (or (null? front-ptr) (null? rear-ptr))
+          (begin (set-front-ptr! null) (set-rear-ptr! null) #t)
+          #f))
+    
+    (define (front-deque)
+      (if (empty-deque?)
+          (error "Deque is empty")
+          (mcar (mcar front-ptr))))
+    (define (rear-deque)
+      (if (empty-deque?)
+          (error "Deque is empty")
+          (mcar (mcar rear-ptr))))
+    (define (get-element ptr)
+      (mcar (mcar ptr)))
+    
+    (define (front-insert-deque! element)
+      (let ((item (mlist (mcons element '()))))
+        (if (empty-deque?)
+            (begin
+              (set-front-ptr! item)
+              (set-rear-ptr! front-ptr))
+            (begin
+              (set-next-ptr! item front-ptr)
+              (set-prev-ptr! front-ptr item)
+              (set-front-ptr! item)))))
+    (define (rear-insert-deque! element)
+      (let ((item (mlist (mcons element rear-ptr))))
+        (if (empty-deque?)
+            (begin
+              (set-front-ptr! item)
+              (set-rear-ptr! front-ptr))
+            (begin
+              (set-mcdr! rear-ptr item)
+              (set-rear-ptr! (mcdr rear-ptr))))))
+ 
+
+    (define (front-delete-deque!)
+      (if (empty-deque?) (error "Deque is empty")
+          (let ((next (next-ptr front-ptr)))
+            (begin
+              (if (not (null? next))
+                  (set-prev-ptr! next null)
+                  '())
+              (set-front-ptr! next)))))
+
+    (define (rear-delete-deque!)
+      (cond ((empty-deque?) (error "Deque is empty"))
+            ((eq? front-ptr rear-ptr) (set-front-ptr! null))
+            (else (begin
+                    (set-rear-ptr! (prev-ptr rear-ptr))
+                    (and (not (empty-deque?)) (set-next-ptr! rear-ptr null))))))
+      
+          
+    (define (pretty-print-deque)
+      (define (print ptr)
+          (if (null? ptr) '()
+              (mcons
+               (get-element ptr)
+               (print (next-ptr ptr)))))
+        (print front-ptr))
+
+    (define (ugly-print-deque)
+      front-ptr)
+    
+    (define (dispatch m)
+      (cond ((eq? m 'insert-front)
+             (lambda (element) (front-insert-deque! element) (ugly-print-deque)))
+            ((eq? m 'insert-rear)
+             (lambda (element) (rear-insert-deque! element) (ugly-print-deque)))
+            ((eq? m 'delete-front)
+             (begin (front-delete-deque!) (ugly-print-deque)))
+            ((eq? m 'delete-rear)
+             (begin (rear-delete-deque!) (ugly-print-deque)))
+            ((eq? m 'front) (front-deque))
+            ((eq? m 'rear) (rear-deque))
+            ((eq? m 'print) (pretty-print-deque))
+            (else (error "No proc for queue"))))
+    dispatch))
+
+(define d (deque))
+((d 'insert-front) 5)
+((d 'insert-front) 4)
+((d 'insert-front) 3)
+((d 'insert-front) 2)
+((d 'insert-rear) 6)
+(d 'print)
+(d 'front)
+(d 'rear)
