@@ -26,7 +26,7 @@
 
 ;; Tables
 (define (make-table)
-  (mcons '*table* null))
+  (mlist '*table))
 
 (define (entry pair)
   (mcar pair))
@@ -41,7 +41,7 @@
 (define t (make-table))
 (lookup 'table t)
 
-(define (insert! key value table)
+(define (insert! table key value)
   (let ((record (massoc key (mcdr table))))
     (if record
         (set-mcdr! record value)
@@ -49,6 +49,34 @@
           (set-mcdr! new-entry (mcdr table))
           (set-mcdr! table new-entry)))))
 
-;(insert! 'a 1 t)
-;(insert! 'a 3 t)
-;(insert! 'b 10 t)
+; (insert! 'a 1 t)
+; (insert! 'a 3 t)
+; (insert! 'b 10 t)
+
+;; 2d tables
+(define (lookup-2d k1 k2 table)
+  (let ((subtable (massoc k1 (mcdr table))))
+    (if subtable
+        (let ((record (massoc k2 (mcdr subtable))))
+          (if record
+              (mcdr record)
+              #f))
+        #f)))
+
+(define (insert-2d! table k1 k2 val)
+  (let ((subtable (massoc k1 (mcdr table))))
+    (if subtable
+        (let ((record (massoc k2 (mcdr subtable))))
+          (if record
+              (set-mcdr! record val)
+              (let ((new-record (mlist (mcons k2 val))))
+                (set-mcdr! new-record (mcdr subtable))
+                (set-mcdr! subtable new-record))))
+        (let ((new-subtable (mlist (mlist k1))))
+          (set-mcdr! new-subtable (mcdr table))
+          (set-mcdr! table new-subtable)
+          (let ((new-record (mlist (mcons k2 val))))
+            (set-mcdr! (mcar new-subtable) new-record))))))
+          
+
+              
