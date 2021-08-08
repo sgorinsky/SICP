@@ -223,3 +223,26 @@
 (define gt (generalized-table))
 ((gt 'insert) (list 'b 'c) 'e)
 ((gt 'insert) (list 'b 'c) 'D)
+
+;; 3.26: Describe a table implementation where the (key, value) records are organized using a binary tree,
+;;       assuming that keys can be ordered in some way (e.g., numerically or alphabetically).
+
+;; Each node could be a pair whose car is a key and whose cdr is a pair referencing other nodes
+;;   If the keys are ordered in the binary tree, then we can more easily search for the key we're looking for
+;;   and recursively search the subtree of each node for the key we're searching,
+;;   otherwise add a new node whose cdr is a new subtree
+
+(define (tree-table)
+  ;; primitives
+  (define (create-branch key val)
+    (mlist (mlist key val) null null))
+  (define (get-node branch)
+    (mcar branch))
+  (define (left-branch branch)
+    (mcar (mcdr branch)))
+  (define (right-branch branch)
+    (mcar (mcdr (mcdr branch))))
+
+  (let ((local-table (create-branch '*table* null)))
+    ;; write internal procs to do stuff
+    ))
