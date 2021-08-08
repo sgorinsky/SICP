@@ -9,26 +9,26 @@
 
 ;; massoc -- equal? key check
 (define (massoc key mlst)
-  (if (null? mlst)
+  (if (not (mpair? mlst))
       #f
-      (let ((pair (mcar mlst)))
-        (if (equal? (mcar pair) key)
-            pair
-            (massoc key (mcdr mlst))))))
+      (let ((record (mcar mlst)))
+        (cond ((not (mpair? record)) #f)
+              ((equal? (mcar record) key) record)
+              (else (massoc key (mcdr mlst)))))))
 
 ;; massq -- eq? key check
 (define (massq key mlst)
-  (if (null? mlst)
+  (if (not (mpair? mlst))
       #f
-      (let ((pair (mcar mlst)))
-        (if (eq? (mcar pair) key)
-            pair
-            (massoc key (mcdr mlst))))))
+      (let ((record (mcar mlst)))
+        (cond ((not (mpair? record)) #f)
+              ((eq? (mcar record) key) record)
+              (else (massq key (mcdr mlst)))))))
             
 
 ;; Tables
 (define (make-table)
-  (mlist '*table))
+  (mlist '*table*))
 
 (define (entry pair)
   (mcar pair))
@@ -50,9 +50,10 @@
         (let ((new-entry (mcons key value)))
           (set-mcdr! table (mcons new-entry (mcdr table)))))))
 
-; (insert! 'a 1 t)
-; (insert! 'a 3 t)
-; (insert! 'b 10 t)
+(define g (make-table))
+(insert! g 'a 1)
+(insert! g 'a 3)
+(insert! g 'b 10)
 
 ;; 2d tables
 (define (lookup-2d table k1 k2)
@@ -125,9 +126,6 @@
 ((lt 'lookup) 'a 'b)
 
 ;; 3.24: Include in make-table constructor an arg same-key? which tests equality of key
-;; 3.24: same-key? for eq? instead of equal? lookups
-;;       Implementation has setter that switches out eq? and equal?
-
 (define (create-table same-key?)
   (let ((local-table (make-table)))
 
@@ -168,3 +166,60 @@
 (define ls (create-table 'eq?))
 ((ls 'insert) 'a 'b 'c)
 ((ls 'lookup) 'a 'b)
+
+;; 3.25: Generalize table lookups to >= 1d
+(define (generalized-table)
+  (let ((local-table (make-table)) (assoc-proc massoc))
+
+    (define (construct-table key)
+      (mlist key))
+    
+    (define (lookup key-list)
+      (define (helper table keys)
+        (if (null? keys)
+            #f
+            (let ((subtable (assoc-proc (car keys) (mcdr table))))
+              (if subtable
+                  (if (null? (cdr keys))
+                      (mcdr subtable)
+                      (helper subtable (cdr keys)))
+                  #f))))
+      (helper local-table key-list))
+                             
+    (define (insert! key-list val)
+      (define (helper table keys)
+        (if (null? keys) val
+        (let ((records (assoc-proc (car keys) (mcdr table))))
+          (if records
+              (if (null? (cdr keys))
+                  (set-mcdr! records val)
+                  (helper records (cdr keys)))
+              (begin
+                (set-mcdr! table
+                           (mcons
+                            (if (null? (cdr keys))
+                                (mcons (car keys) val)
+                                (mcons (car keys) (mlist (helper (mlist null) (cdr keys)))))
+                            (mcdr table)))
+                (mcar (mcdr table)))))))
+      (helper local-table key-list)
+      'ok)
+
+    (define (set-lookup!)
+      (display "Use 'eq?' or 'equal?' ")
+      (let ((response (read)))
+        (cond ((or (eq? response 'eq?) (eq? response 'eq)) (set! assoc-proc massq))
+              ((or (eq? response 'equal?) (eq? response 'equal)) (set! assoc-proc massoc))
+              (else (error "Improper answer: " response)))))
+    
+    (define (dispatch m)
+      (cond ((eq? m 'lookup) lookup)
+            ((eq? m 'insert) insert!)
+            ((eq? m 'set-lookup) (set-lookup!))
+            ((eq? m 'print) local-table)
+            (else (error "Unknown operation: TABLE" m))))
+    dispatch))
+
+(define gt (generalized-table))
+((gt 'insert) (list 'b 'c) 'e)
+((gt 'insert) (list 'b 'c) 'D)
