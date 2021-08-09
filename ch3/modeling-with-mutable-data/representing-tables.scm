@@ -233,9 +233,12 @@
 ;;   otherwise add a new node whose cdr is a new subtree
 
 (define (tree-table)
-  ; selectors
+  ;; tree primitives
+  ; constructors
   (define (create-branch key val)
     (mlist (mcons key val) null null))
+  
+  ; selectors
   (define (get-node branch)
     (mcar branch))
   (define (get-key branch)
@@ -259,9 +262,9 @@
     (or (is-leaf? branch) (null? (go-to-next branch key))))
   
   ; mutators
-  (define (create-left-branch! branch key val)
+  (define (extend-left-branch! branch key val)
     (set-mcar! (mcdr branch) (create-branch key val)))
-  (define (create-right-branch! branch key val)
+  (define (extend-right-branch! branch key val)
     (set-mcar! (mcdr (mcdr branch)) (create-branch key val)))
   (define (set-value! branch val)
     (set-mcdr! (get-node branch) val))
@@ -269,10 +272,10 @@
     (if (is-next-empty? branch key)
         (if (< key (get-key branch))
             (begin
-              (create-left-branch! branch key null)
+              (extend-left-branch! branch key null)
               (left-branch branch))
             (begin
-              (create-right-branch! branch key null)
+              (extend-right-branch! branch key null)
               (right-branch branch)))
         (add-branch! (go-to-next branch key) key)))
                
@@ -282,8 +285,7 @@
           ((eq? key (get-key branch)) branch)
           (else (assq-tree (go-to-next branch key) key))))
 
-   
-           
+  ; tree-table body
   (let ((local-table null))
     ;; internal procs
     (define (insert! key-list val)
@@ -309,7 +311,7 @@
 
     (define (lookup key-list)
       (define (helper tree keys)
-        (if (null? keys)
+        (if (or (null? keys) (not (mpair? tree)))
             #f          
             (let ((tree (assq-tree tree (car keys))))
               (if tree
