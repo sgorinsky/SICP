@@ -233,16 +233,106 @@
 ;;   otherwise add a new node whose cdr is a new subtree
 
 (define (tree-table)
-  ;; primitives
+  ; selectors
   (define (create-branch key val)
     (mlist (mlist key val) null null))
   (define (get-node branch)
     (mcar branch))
+  (define (get-key branch)
+    (mcar (get-node branch)))
+  (define (get-value branch)
+    (mcdr (get-node branch)))
   (define (left-branch branch)
     (mcar (mcdr branch)))
   (define (right-branch branch)
     (mcar (mcdr (mcdr branch))))
+  (define (go-to-next branch key)
+    (cond ((< key (get-key branch)) (left-branch branch))
+          ((> key (get-key branch)) (right-branch branch))
+          (else (get-value branch))))
 
-  (let ((local-table (create-branch '*table* null)))
-    ;; write internal procs to do stuff
-    ))
+  ; predicates
+  (define (is-leaf? branch)
+    (and (null? left-branch) (null? right-branch)))
+  (define (is-next-empty? branch key)
+    (null? (go-to-next branch key)))
+
+  ; mutators
+  (define (set-left-branch! branch key val)
+    (let ((left (left-branch branch)))
+      (set! left (create-branch key val))))
+  (define (set-right-branch! branch key val)
+    (let ((right (right-branch branch)))
+      (set! right (create-branch key val))))
+  (define (set-value! branch val)
+    (let ((branch-val (get-value branch)))
+      (set! branch-val val)))
+  (define (add-branch! branch key val)
+    (if (is-next-empty? branch key)
+        (if (< key (get-key branch))
+            (begin
+              (set-left-branch! branch key val)
+              (left-branch branch))
+            (begin
+              (set-right-branch! branch key val)
+              (right-branch branch)))
+        (add-branch! (go-to-next branch key) key val)))
+               
+  ; finders
+  (define (assq-tree branch key)
+    (cond ((null? branch) #f)
+          ((eq? (get-value branch) (go-to-next branch key)) branch)
+          (else (assq-tree (go-to-next branch key) key))))
+
+   
+           
+  (let ((local-table null))
+    ;; internal procs
+    (define (insert! key-list val)
+      (define (helper branch keys)
+        (if (null? keys)
+            (set-value! branch val)
+            (let ((subtree (assq-tree branch (car keys))))
+              (if subtree
+                  (if (null? (cdr keys))
+                      (set-value! branch val)
+                      (begin
+                        (set-value! branch (create-branch (car keys) null))
+                        (helper (get-value branch) (cdr keys))))
+                  (helper (add-branch! branch (car keys) val) keys)))))
+      (if (null? local-table)
+          (begin
+            (set! local-table (create-branch (car key-list) val))
+            (helper local-table key-list))
+          (helper local-table key-list)))
+
+    (define (lookup key-list)
+      (define (helper tree keys)
+        (if (null? keys)
+            #f          
+            (let ((tree (massq (car keys))))
+              (if tree
+                  (if (null? (cdr keys))
+                      (get-value tree)
+                      (helper (get-value tree) (cdr keys)))
+                  #f))))
+      (helper local-table key-list))
+
+    (define (dispatch m)
+      (cond ((eq? m 'insert) insert!)
+            ((eq? m 'lookup) lookup)
+            ((eq? m 'print) local-table)
+            (else (error "No proc: " m))))
+    dispatch))
+
+(define tree (tree-table))
+((tree 'insert) (list 1) 2)
+(tree 'print)
+((tree 'insert) (list 0) 4)
+(tree 'print)
+
+
+
+
+
+      
