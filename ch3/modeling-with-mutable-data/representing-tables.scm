@@ -293,12 +293,11 @@
             (let ((subtree (assq-tree branch (car keys))))
               (if subtree
                   (if (null? (cdr keys))
-                      (set-value! branch val)
+                      (set-value! subtree val)
                       (begin
-                        (set-value! branch (create-branch (car keys) null))
-                        (helper (get-value branch) (cdr keys))))
-                  (let ((next-branch (add-branch! branch (car keys) val)))
-                    (helper next-branch keys))))))
+                        (set-value! subtree (create-branch (cadr keys) null))
+                        (helper (get-value subtree) (cddr keys))))
+                    (helper (add-branch! branch (car keys) val) keys)))))
       (if (null? local-table)
           (begin
             (set! local-table (create-branch (car key-list) val))
@@ -331,7 +330,8 @@
 (tree 'print)
 ((tree 'insert) (list 2) 5)
 (tree 'print)
-((tree 'lookup) (list 2))
+((tree 'insert) (list 1 2) 3)
+((tree 'lookup) (list 1))
 
 
 
