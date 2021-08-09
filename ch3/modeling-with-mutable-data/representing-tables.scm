@@ -339,7 +339,7 @@
 ((tree 'insert) (list 1 2 3) 4)
 ((tree 'lookup) (list 1 2))
 
-;; 3.26: Draw env diagram for memoized fib
+;; 3.27: Draw env diagram for memoized fib
 (define (fib n)
   (cond ((= n 0) 0)
         ((= n 1) 1)
@@ -349,10 +349,10 @@
 (define (memoize f)
   (let ((table (make-table)))
     (lambda (x)
-      (let ((previously-computed-result (lookup table x)))
+      (let ((previously-computed-result (lookup x table)))
         (or previously-computed-result
             (let ((result (f x)))
-              (insert-2d! table x result) result))))))
+              (insert! table x result) result))))))
 
 (define memo-fib
   (memoize
@@ -361,4 +361,4 @@
            ((= n 1) 1)
            (else (+ (memo-fib (- n 1))
                     (memo-fib (- n 2))))))))
-      
+
