@@ -287,26 +287,24 @@
 
   ; tree-table body
   (let ((local-table null))
+
     ;; internal procs
     (define (insert! key-list val)
+
       (define (helper branch keys)
         (let ((subtree (assq-tree branch (car keys))))
           (if subtree
               (if (null? (cdr keys))
                   (set-value! subtree val)
                   (begin
-                    (if (not (mpair? (get-value subtree)))
-                        (set-value! subtree (create-branch (cadr keys) null))
-                        subtree)
+                    (cond ((not (mpair? (get-value subtree))) (set-value! subtree (create-branch (cadr keys) null))))
                     (helper (get-value subtree) (cdr keys))))
               (helper (add-branch! branch (car keys)) keys))))
 
       (cond ((not (pair? key-list)) (error "Provide a list of keys"))
-            ((null? local-table)
-             (begin
-               (set! local-table (create-branch (car key-list) null))
-               (helper local-table key-list)))
-             (else (helper local-table key-list)))
+            ((null? local-table) (set! local-table (create-branch (car key-list) null))))
+
+      (helper local-table key-list)
       'ok)
 
     (define (lookup key-list)
