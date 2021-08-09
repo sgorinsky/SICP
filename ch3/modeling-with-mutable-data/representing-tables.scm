@@ -235,7 +235,7 @@
 (define (tree-table)
   ; selectors
   (define (create-branch key val)
-    (mlist (mlist key val) null null))
+    (mlist (mcons key val) null null))
   (define (get-node branch)
     (mcar branch))
   (define (get-key branch)
@@ -257,7 +257,7 @@
     (and (null? left-branch) (null? right-branch)))
   (define (is-next-empty? branch key)
     (or (is-leaf? branch) (null? (go-to-next branch key))))
-
+  
   ; mutators
   (define (create-left-branch! branch key val)
     (set-mcar! (mcdr branch) (create-branch key val)))
@@ -265,21 +265,21 @@
     (set-mcar! (mcdr (mcdr branch)) (create-branch key val)))
   (define (set-value! branch val)
     (set-mcdr! (get-node branch) val))
-  (define (add-branch! branch key val)
+  (define (add-branch! branch key)
     (if (is-next-empty? branch key)
         (if (< key (get-key branch))
             (begin
-              (create-left-branch! branch key val)
+              (create-left-branch! branch key null)
               (left-branch branch))
             (begin
-              (create-right-branch! branch key val)
+              (create-right-branch! branch key null)
               (right-branch branch)))
-        (add-branch! (go-to-next branch key) key val)))
+        (add-branch! (go-to-next branch key) key)))
                
   ; finders
   (define (assq-tree branch key)
     (cond ((null? branch) #f)
-          ((eq? (get-value branch) (go-to-next branch key)) branch)
+          ((eq? key (get-key branch)) branch)
           (else (assq-tree (go-to-next branch key) key))))
 
    
@@ -288,23 +288,24 @@
     ;; internal procs
     (define (insert! key-list val)
       (define (helper branch keys)
-        (if (null? keys)
-            (set-value! branch val)
-            (let ((subtree (assq-tree branch (car keys))))
-              (if subtree
-                  (if (null? (cdr keys))
-                      (set-value! subtree val)
-                      (begin
-                        (if (not (mpair? (get-value subtree)))
-                            (set-value! subtree (create-branch (cadr keys) null))
-                            subtree)
-                        (helper (get-value subtree) (cdr keys))))
-                    (helper (add-branch! branch (car keys) val) keys)))))
-      (if (null? local-table)
-          (begin
-            (set! local-table (create-branch (car key-list) val))
-            (helper local-table key-list))
-          (helper local-table key-list)))
+        (let ((subtree (assq-tree branch (car keys))))
+          (if subtree
+              (if (null? (cdr keys))
+                  (set-value! subtree val)
+                  (begin
+                    (if (not (mpair? (get-value subtree)))
+                        (set-value! subtree (create-branch (cadr keys) null))
+                        subtree)
+                    (helper (get-value subtree) (cdr keys))))
+              (helper (add-branch! branch (car keys)) keys))))
+
+      (cond ((not (pair? key-list)) (error "Provide a list of keys"))
+            ((null? local-table)
+             (begin
+               (set! local-table (create-branch (car key-list) null))
+               (helper local-table key-list)))
+             (else (helper local-table key-list)))
+      'ok)
 
     (define (lookup key-list)
       (define (helper tree keys)
@@ -327,17 +328,37 @@
     dispatch))
 
 (define tree (tree-table))
-((tree 'insert) (list 1) 2)
+((tree 'insert) (list 1 3) 2)
 (tree 'print)
 ((tree 'insert) (list 0) 4)
 (tree 'print)
 ((tree 'insert) (list 2) 5)
 (tree 'print)
-((tree 'insert) (list 1 2) 3)
+((tree 'insert) (list 10 2) 3)
 ((tree 'lookup) (list 1))
 ((tree 'insert) (list 1 2 3) 4)
 ((tree 'lookup) (list 1 2))
 
+;; 3.26: Draw env diagram for memoized fib
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
 
+(define (memoize f)
+  (let ((table (make-table)))
+    (lambda (x)
+      (let ((previously-computed-result (lookup table x)))
+        (or previously-computed-result
+            (let ((result (f x)))
+              (insert-2d! table x result) result))))))
 
+(define memo-fib
+  (memoize
+   (lambda (n)
+     (cond ((= n 0) 0)
+           ((= n 1) 1)
+           (else (+ (memo-fib (- n 1))
+                    (memo-fib (- n 2))))))))
       
