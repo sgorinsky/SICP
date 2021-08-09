@@ -247,34 +247,32 @@
   (define (right-branch branch)
     (mcar (mcdr (mcdr branch))))
   (define (go-to-next branch key)
-    (cond ((< key (get-key branch)) (left-branch branch))
+    (cond ((null? branch) null)
+          ((< key (get-key branch)) (left-branch branch))
           ((> key (get-key branch)) (right-branch branch))
-          (else (get-value branch))))
+          (else (equal? key (get-key branch)) (get-value branch))))
 
   ; predicates
   (define (is-leaf? branch)
     (and (null? left-branch) (null? right-branch)))
   (define (is-next-empty? branch key)
-    (null? (go-to-next branch key)))
+    (or (is-leaf? branch) (null? (go-to-next branch key))))
 
   ; mutators
-  (define (set-left-branch! branch key val)
-    (let ((left (left-branch branch)))
-      (set! left (create-branch key val))))
-  (define (set-right-branch! branch key val)
-    (let ((right (right-branch branch)))
-      (set! right (create-branch key val))))
+  (define (create-left-branch! branch key val)
+    (set-mcar! (mcdr branch) (create-branch key val)))
+  (define (create-right-branch! branch key val)
+    (set-mcar! (mcdr (mcdr branch)) (create-branch key val)))
   (define (set-value! branch val)
-    (let ((branch-val (get-value branch)))
-      (set! branch-val val)))
+    (set-mcdr! (get-node branch) val))
   (define (add-branch! branch key val)
     (if (is-next-empty? branch key)
         (if (< key (get-key branch))
             (begin
-              (set-left-branch! branch key val)
+              (create-left-branch! branch key val)
               (left-branch branch))
             (begin
-              (set-right-branch! branch key val)
+              (create-right-branch! branch key val)
               (right-branch branch)))
         (add-branch! (go-to-next branch key) key val)))
                
@@ -299,7 +297,8 @@
                       (begin
                         (set-value! branch (create-branch (car keys) null))
                         (helper (get-value branch) (cdr keys))))
-                  (helper (add-branch! branch (car keys) val) keys)))))
+                  (let ((next-branch (add-branch! branch (car keys) val)))
+                    (helper next-branch keys))))))
       (if (null? local-table)
           (begin
             (set! local-table (create-branch (car key-list) val))
@@ -310,7 +309,7 @@
       (define (helper tree keys)
         (if (null? keys)
             #f          
-            (let ((tree (massq (car keys))))
+            (let ((tree (assq-tree tree (car keys))))
               (if tree
                   (if (null? (cdr keys))
                       (get-value tree)
@@ -330,8 +329,9 @@
 (tree 'print)
 ((tree 'insert) (list 0) 4)
 (tree 'print)
-
-
+((tree 'insert) (list 2) 5)
+(tree 'print)
+((tree 'lookup) (list 2))
 
 
 
