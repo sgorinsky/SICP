@@ -295,8 +295,10 @@
                   (if (null? (cdr keys))
                       (set-value! subtree val)
                       (begin
-                        (set-value! subtree (create-branch (cadr keys) null))
-                        (helper (get-value subtree) (cddr keys))))
+                        (if (not (mpair? (get-value subtree)))
+                            (set-value! subtree (create-branch (cadr keys) null))
+                            subtree)
+                        (helper (get-value subtree) (cdr keys))))
                     (helper (add-branch! branch (car keys) val) keys)))))
       (if (null? local-table)
           (begin
@@ -321,6 +323,7 @@
             ((eq? m 'lookup) lookup)
             ((eq? m 'print) local-table)
             (else (error "No proc: " m))))
+    
     dispatch))
 
 (define tree (tree-table))
@@ -332,6 +335,8 @@
 (tree 'print)
 ((tree 'insert) (list 1 2) 3)
 ((tree 'lookup) (list 1))
+((tree 'insert) (list 1 2 3) 4)
+((tree 'lookup) (list 1 2))
 
 
 
