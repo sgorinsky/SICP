@@ -339,7 +339,7 @@
 ((tree 'insert) (list 1 2 3) 4)
 ((tree 'lookup) (list 1 2))
 
-;; 3.27: Draw env diagram for memoized fib
+;;3.27: Draw env diagram for memoized fib
 (define (fib n)
   (cond ((= n 0) 0)
         ((= n 1) 1)
