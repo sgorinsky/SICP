@@ -66,7 +66,8 @@
 (define fibs
   (cons-stream 0 (cons-stream 1 (add-streams (stream-cdr fibs) fibs))))
 
-; build prime stream w/ stream-filter and prime? predicate
+; build prime stream w/ stream-filter and prime? predicate which checks existing list of primes stream
+;     these two procs are mutually referential
 (define (prime? n)
   (define (iter ps)
     (cond ((> (square (stream-car ps)) n) true)
@@ -85,4 +86,20 @@
 ; define powers of two by recursively multiplying successive elements in stream by 2
 ; (cons-stream 1 (stream-map (* 2 (cons-stream 1 (stream-map (* 2 (cons-stream 1 ...)
 (define double (cons-stream 1 (scale-stream double 2)))
+
+;; 3.53: Describe what happens in proc below
+(define s (cons-stream 1 (add-streams s s)))
+
+; (1 (promise of map + (1 promise) (1 promise)))
+; (1 (2 (promise of map + (2 promise) (2 promise))))...
+; s returns a stream of powers of two...
+; ...and without fail, (stream-ref s 4) returns 16
+
+
+;; 3.54: Implement analog to add-stream, mul-streams and implement factorial
+(define (mul-streams s1 s2)
+  (stream-map * s1 s2))
+
+(define factorial
+  (cons-stream 1 (mul-streams factorial (integers-starting-from 2))))
 
