@@ -39,7 +39,6 @@
 
 ; (define integers (integers-starting-from 1)) ; redefining integers below
 
-
 (define (divisible? x y) (= (modulo x y) 0))
 
 ; sieve of eratosthenes: filters rest of stream with current prime and leaves candidates in stream until we
@@ -52,6 +51,7 @@
              (not (divisible? x (stream-car stream))))
            (stream-cdr stream)))))
 
+(define sieve-of-eratosthenes (sieve (integers-starting-from 2)))
 ; creating integers by adding two streams in a "just-in-time" fashion
 (define (add-streams s1 s2) (stream-map + s1 s2))
 
@@ -76,3 +76,13 @@
 
 (define primes
   (cons-stream 2 (stream-filter prime? (integers-starting-from 3))))
+
+; scale-stream
+(define (scale-stream stream factor)
+  (stream-map (lambda (x) (* x factor))
+              stream))
+
+; define powers of two by recursively multiplying successive elements in stream by 2
+; (cons-stream 1 (stream-map (* 2 (cons-stream 1 (stream-map (* 2 (cons-stream 1 ...)
+(define double (cons-stream 1 (scale-stream double 2)))
+
