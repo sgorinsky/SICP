@@ -1,4 +1,5 @@
 #lang sicp
+(define square (lambda (x) (* x x)))
 
 ;; stream primitives
 (define (stream-car stream)
@@ -51,7 +52,7 @@
              (not (divisible? x (stream-car stream))))
            (stream-cdr stream)))))
 
-; creating integers by adding two streams
+; creating integers by adding two streams in a "just-in-time" fashion
 (define (add-streams s1 s2) (stream-map + s1 s2))
 
 (define ones
@@ -59,3 +60,19 @@
 
 (define integers
   (cons-stream 1 (add-streams ones integers)))
+
+; start w/ (0 promise) -> (0 (1 promise)) -> where promise adds first and second elements then recursively
+;          builds stream by adding element just created w/ previous element created
+(define fibs
+  (cons-stream 0 (cons-stream 1 (add-streams (stream-cdr fibs) fibs))))
+
+; build prime stream w/ stream-filter and prime? predicate
+(define (prime? n)
+  (define (iter ps)
+    (cond ((> (square (stream-car ps)) n) true)
+          ((divisible? n (stream-car ps)) false)
+          (else (iter (stream-cdr ps)))))
+  (iter primes))
+
+(define primes
+  (cons-stream 2 (stream-filter prime? (integers-starting-from 3))))
