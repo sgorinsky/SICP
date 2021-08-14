@@ -96,10 +96,44 @@
 ; ...and without fail, (stream-ref s 4) returns 16
 
 
-;; 3.54: Implement analog to add-stream, mul-streams and implement factorial
+;; 3.54: Implement analog to add-stream, mul-streams, and implement factorial
 (define (mul-streams s1 s2)
   (stream-map * s1 s2))
 
 (define factorial
   (cons-stream 1 (mul-streams factorial (integers-starting-from 2))))
 
+;; 3.55: Partial Streams, where each element is sum of all elements up until and including that element
+(define (partial-sums stream)
+  (define (iter sum strm)
+    (if (stream-null? strm)
+        the-empty-stream
+        (let ((next-sum (+ (stream-car strm) sum)))
+          (cons-stream next-sum (iter next-sum (stream-cdr strm))))))
+  (iter 0 stream))
+
+; (stream-ref (partial-sums ones) 2) ; 3 (1 2 3)
+; (stream-ref (partial-sums integers) 2) ; 6 (1 3 6)
+
+;; 3.56: Enumerate in ascending order all positive integers with no prime-factors other than 2, 3, or 5
+(define (merge s1 s2)
+  (cond ((stream-null? s1) s2)
+        ((stream-null? s2) s1)
+        (else
+         (let ((s1car (stream-car s1)) (s2car (stream-car s2)))
+           (cond ((< s1car s2car)
+                  (cons-stream
+                   s1car
+                   (merge (stream-cdr s1) s2)))
+                 ((> s1car s2car)
+                  (cons-stream
+                   s2car
+                   (merge s1 (stream-cdr s2))))
+                 (else (cons-stream
+                        s1car
+                        (merge (stream-cdr s1)
+                               (stream-cdr s2)))))))))
+
+(define S (cons-stream 1 (merge (scale-stream S 2)
+                                (merge (scale-stream S 3) (scale-stream S 5)))))
+                        
