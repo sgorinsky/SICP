@@ -135,4 +135,30 @@
                                (stream-cdr s2)))))))))
 
 (define S (cons-stream 1 (merge (scale-stream S 2)
-                                (merge (scale-stream S 3) (scale-stream S 5)))))                        
+                                (merge (scale-stream S 3) (scale-stream S 5)))))
+
+;; 3.57: Recall definition of memo-proc. How many calls to delay are cut out when memoizing force calls in
+;;       fibonacci
+
+(define (memo-proc proc)
+  (let ((already-run? false) (result false))
+    (lambda ()
+      (if (not already-run?)
+          (begin
+            (set! result (proc))
+            (set! already-run? true)
+            result)
+          result))))
+
+; recall def of fibs:
+;(define fibs
+;  (cons-stream 0 (cons-stream 1 (add-streams (stream-cdr fibs) fibs))))
+
+; For each new element in fibonacci, f(n) = f(n-1) + f(n-2)
+;   W/o memoization, each of the values creating f(n) have to be recomputed and then those must be until 0 and 1
+;   Therefore, the complexity w/o memo is O(2^n) to calculate each element in fibs
+
+; Including memo however cuts down the lookup for each f(n) to O(1) b/c we have the last two values calculated,
+;   f(n-1) and f(n-2), conveniently at the front of the memo table.
+
+; Thus, memo cuts down on ~2^n calculations for each element created in fib
