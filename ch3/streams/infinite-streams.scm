@@ -155,10 +155,29 @@
 ;  (cons-stream 0 (cons-stream 1 (add-streams (stream-cdr fibs) fibs))))
 
 ; For each new element in fibonacci, f(n) = f(n-1) + f(n-2)
-;   W/o memoization, each of the values creating f(n) have to be recomputed and then those must be until 0 and 1
+;   W/o memoization, each of the values creating f(n) in map have to be recomputed and then
+;     those must be so on and so forth until 
 ;   Therefore, the complexity w/o memo is O(2^n) to calculate each element in fibs
 
 ; Including memo however cuts down the lookup for each f(n) to O(1) b/c we have the last two values calculated,
 ;   f(n-1) and f(n-2), conveniently at the front of the memo table.
 
 ; Thus, memo cuts down on ~2^n calculations for each element created in fib
+
+;; 3.58: Interpret the following procedure
+(define (expand num den radix)
+  (cons-stream
+   (quotient (* num radix) den)
+   (expand (remainder (* num radix) den) den radix)))
+
+; This procedure creates a series by floor dividing a number * radix by a divisor. This number then
+;    tries to closely approximate in a series by streaming the sum of expanded remainders
+
+;; 3.59: Streams as integration series
+
+; a. Create proc integrate-series that takes a stream as input -- a0, a1, ... -- and returns a0/1, a1/2, ...
+(define (integrate-series a-stream)
+  (define (iter stream denom)
+    (cons-stream (/ (stream-car stream) denom) (iter (stream-cdr stream) (+ denom 1))))
+  (iter a-stream 1))
+
