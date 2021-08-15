@@ -193,3 +193,13 @@
 (define sine-series
   (cons-stream 0 (integrate-series (stream-map (lambda (x) (* -1 x)) cosine-series))))
 
+;; 3.60: Implement mul-series with add-streams
+(define (mul-series s1 s2)
+  (cons-stream (* (stream-car s1) (stream-car s2))
+               (add-streams
+                (scale-stream (stream-cdr s2) (stream-car s1))
+                (mul-series (stream-cdr s1) s2))))
+
+; first element is 1 followed by 0s
+(define sine^2+cos^2
+  (add-streams (mul-series cosine-series cosine-series) (mul-series sine-series sine-series)))
