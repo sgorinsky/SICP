@@ -173,11 +173,23 @@
 ; This procedure creates a series by floor dividing a number * radix by a divisor. This number then
 ;    tries to closely approximate in a series by streaming the sum of expanded remainders
 
-;; 3.59: Streams as integration series
 
+;; 3.59: Streams as integration series
 ; a. Create proc integrate-series that takes a stream as input -- a0, a1, ... -- and returns a0/1, a1/2, ...
 (define (integrate-series a-stream)
   (define (iter stream denom)
-    (cons-stream (/ (stream-car stream) denom) (iter (stream-cdr stream) (+ denom 1))))
+    (cons-stream
+     (/ (stream-car stream) denom)
+     (iter (stream-cdr stream) (+ denom 1))))
   (iter a-stream 1))
+
+; b. Create procs for sine and cosine series given that the derivatives of sine and cosine are cosine and sine
+(define exp-series
+  (cons-stream 1 (integrate-series exp-series)))
+
+(define cosine-series
+  (cons-stream 1 (integrate-series sine-series)))
+
+(define sine-series
+  (cons-stream 0 (integrate-series (stream-map (lambda (x) (* -1 x)) cosine-series))))
 
