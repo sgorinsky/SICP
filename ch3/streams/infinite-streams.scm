@@ -184,12 +184,8 @@
 
 ;; 3.59: Streams as integration series
 ; a. Create proc integrate-series that takes a stream as input -- a0, a1, ... -- and returns a0/1, a1/2, ...
-(define (integrate-series a-stream)
-  (define (iter stream denom)
-    (cons-stream
-     (/ (stream-car stream) denom)
-     (iter (stream-cdr stream) (+ denom 1))))
-  (iter a-stream 1))
+(define (integrate-series S)
+  (stream-map / S integers))
 
 ; b. Create procs for sine and cosine series given that the derivatives of sine and cosine are cosine and sine
 (define exp-series
