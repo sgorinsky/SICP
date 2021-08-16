@@ -8,6 +8,15 @@
 (define (stream-cdr stream)
   (force (cdr stream)))
 
+;; stream helper
+(define (show-stream S n)
+  (if (= n 0)
+      (display (stream-car S))
+      (begin
+        (display (stream-car S))
+        (newline)
+        (show-stream (stream-cdr S) (- n 1)))))
+
 ;; Stream functors
 (define (stream-filter pred? stream)
   (cond ((stream-null? stream) stream)
