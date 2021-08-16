@@ -203,3 +203,15 @@
 ; first element is 1 followed by 0s
 (define sine^2+cos^2
   (add-streams (mul-series cosine-series cosine-series) (mul-series sine-series sine-series)))
+
+;; 3.61: invert-unit-series
+
+; SX = 1, where S is power series w/ constant term 1 and X is its inverse
+; if we define (1 + Sr) where Sr is (stream-cdr S) --> (1 + Sr)X = 1
+; X + SrX = 1
+; X = 1 - SrX
+; therefore, X is a recursive call to an inversion proc with arg S ... MIND BLOWN
+(define (invert-unit-series S)
+  (cons-stream 1 (scale-stream (mul-series (stream-cdr S) (invert-unit-series S)) -1))) 
+  
+(define inv (mul-series (invert-unit-series cosine-series) cosine-series)) ; (1 0 0 0 0 0 0 ...)
