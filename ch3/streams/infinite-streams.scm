@@ -80,8 +80,7 @@
 
 ; scale-stream
 (define (scale-stream stream factor)
-  (stream-map (lambda (x) (* x factor))
-              stream))
+  (stream-map (lambda (x) (* x factor)) stream))
 
 ; define powers of two by recursively multiplying successive elements in stream by 2
 ; (cons-stream 1 (stream-map (* 2 (cons-stream 1 (stream-map (* 2 (cons-stream 1 ...)
@@ -187,11 +186,13 @@
 (define exp-series
   (cons-stream 1 (integrate-series exp-series)))
 
+; d(cosx)/dx = -sinx -> sinx dx = -cosx. so why is neg scale of sine in cosine?
+; if sine-series scaled rest of stream by -1, alternating elements in series would be off by factor -1
 (define cosine-series
-  (cons-stream 1 (integrate-series sine-series)))
+  (cons-stream 1 (integrate-series (scale-stream sine-series -1))))
 
 (define sine-series
-  (cons-stream 0 (integrate-series (stream-map (lambda (x) (* -1 x)) cosine-series))))
+  (cons-stream 0 (integrate-series cosine-series)))
 
 ;; 3.60: Implement mul-series with add-streams
 (define (mul-series s1 s2)
@@ -212,6 +213,12 @@
 ; X = 1 - SrX
 ; therefore, X is a recursive call to an inversion proc with arg S ... MIND BLOWN
 (define (invert-unit-series S)
-  (cons-stream 1 (scale-stream (mul-series (stream-cdr S) (invert-unit-series S)) -1))) 
+  (cons-stream (stream-car S) (scale-stream (mul-series (stream-cdr S) (invert-unit-series S)) -1)))
   
 (define inv (mul-series (invert-unit-series cosine-series) cosine-series)) ; (1 0 0 0 0 0 0 ...)
+
+;; 3.62:  Create div-series and generate tan power series
+(define (div-series num denom)
+  (mul-series num (invert-unit-series denom)))
+
+(define tan-series (div-series sine-series cosine-series))
