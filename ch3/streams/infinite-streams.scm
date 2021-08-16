@@ -184,6 +184,14 @@
 
 ;; 3.59: Streams as integration series
 ; a. Create proc integrate-series that takes a stream as input -- a0, a1, ... -- and returns a0/1, a1/2, ...
+
+; iterative integrate-series --> harder to understand
+;(define (integrate-series a-stream)
+;    (cons-stream
+;     (/ (stream-car stream) denom)
+;     (iter (stream-cdr stream) (+ denom 1))))
+;  (iter a-stream 1))
+
 (define (integrate-series S)
   (stream-map / S integers))
 
