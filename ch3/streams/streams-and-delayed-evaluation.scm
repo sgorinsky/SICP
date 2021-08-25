@@ -42,3 +42,12 @@
   (define dy (integral (delay ddy) dy0 dt))
   (define ddy (stream-map f dy y))
   y)
+
+;; 3.80: RLC Diffeq
+(define (RLC R L C vc0 iL0 dt)
+  (define diL (add-streams (scale-stream vc (/ 1 L)) (scale-stream iL (/ -R L))))
+  (define dvc (scale-stream iL (/ -1 C)))
+  (define vc (integral (delay dvc) vc0 dt))
+  (define iL (integral (delay diL) iL0 dt))
+  (cons vc iL)) ; ((ptr to vc stream) . (ptr to iL stream))
+  
