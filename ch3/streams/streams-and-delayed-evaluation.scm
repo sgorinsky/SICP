@@ -28,3 +28,5 @@
          (integral (delay (stream-cdr integrand))
                    (+ (* dt (stream-car integrand)) initial-value)
                    dt)))))
+
+;; 3.78: Create proc that generates successive values of y from diff eq
