@@ -29,14 +29,16 @@
                    (+ (* dt (stream-car integrand)) initial-value)
                    dt)))))
 
-;; 3.78: Create proc that generates successive values of y from diff eq
-(define (solve-2nd a b dt y0 dy0)
-  (define y
-    (integral (delay dy) y0 dt))
-  (define dy
-    (integral (delay ddy) dy0 dt)) 
-  (define ddy
-    (add-streams
-     (scale-stream a dy)
-     (scale-stream b y)))
+;; 3.78: Create proc that generates successive values of y from diff eq 
+(define (solve-2nd a b y0 dy0 dt)
+  (define y (integral (delay dy) y0 dt))
+  (define dy (integral (delay ddy) dy0 dt)) 
+  (define ddy (add-streams (scale-stream a dy) (scale-stream b y)))
+  y)
+
+;; 3.79: Generalize solve-2nd so d^2 y/dt^2 = f(dy/dt, y)
+(define (general-solve-2nd f y0 dy0 dt)
+  (define y (integrate (delay dy) y0 dt))
+  (define dy (integrate (delay ddy) dy0 dt))
+  (define ddy (stream-map f dy y))
   y)
