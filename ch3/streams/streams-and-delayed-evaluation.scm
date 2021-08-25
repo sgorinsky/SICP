@@ -38,7 +38,7 @@
 
 ;; 3.79: Generalize solve-2nd so d^2 y/dt^2 = f(dy/dt, y)
 (define (general-solve-2nd f y0 dy0 dt)
-  (define y (integrate (delay dy) y0 dt))
-  (define dy (integrate (delay ddy) dy0 dt))
+  (define y (integral (delay dy) y0 dt))
+  (define dy (integral (delay ddy) dy0 dt))
   (define ddy (stream-map f dy y))
   y)
