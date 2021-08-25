@@ -1,5 +1,4 @@
 #lang sicp
-
 ; stream boilerplate
 (define (stream-car stream)
   (car stream))
