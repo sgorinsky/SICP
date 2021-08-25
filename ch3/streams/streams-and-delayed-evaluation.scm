@@ -30,3 +30,13 @@
                    dt)))))
 
 ;; 3.78: Create proc that generates successive values of y from diff eq
+(define (solve-2nd a b dt y0 dy0)
+  (define y
+    (integral (delay dy) y0 dt))
+  (define dy
+    (integral (delay ddy) dy0 dt)) 
+  (define ddy
+    (add-streams
+     (scale-stream a dy)
+     (scale-stream b y)))
+  y)
