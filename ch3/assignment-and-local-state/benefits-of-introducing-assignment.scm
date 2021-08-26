@@ -105,7 +105,22 @@
     (monte-carlo number-trials is-inside-pred-test)))
 
 (define unit-circle-test (estimate-integral (circle-predicate 0 0 1) -2 2 -2 2 100000))
-    
-    
+
+;; 3.6: Generalized random-number-generator that allows for 'reset and 'generate procs
+(define random-number-generator
+  (let ((x random-init))
+    (define (reset seed)
+      (set! x seed)
+      x)
+    (define (generate)
+      (set! x (rand-update x))
+      x)
+    (define (dispatch m)
+      (cond ((eq? m 'reset) reset)
+            ((eq? m 'generate) (generate))
+            (else (error "No proc " m))))
+    dispatch))
+            
+(define x random-number-generator)
       
 
