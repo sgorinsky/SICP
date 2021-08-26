@@ -54,7 +54,7 @@
 ;; 3.5: implement monte-carlo integration as proc estimate-integral to estimate area of
 ;       rectangle that encloses unit circle at random
 
-; point primitives
+; point prims
 (define (make-point x y)
   (list x y))
 (define (get-x point)
@@ -62,7 +62,7 @@
 (define (get-y point)
   (cadr point))
 
-; rect primitives
+; rect prims
 (define (make-rectangle p1 p2)
   (list p1 p2))
 (define (get-bottom-left rect)
@@ -70,17 +70,16 @@
 (define (get-top-right rect)
   (cadr rect))
 
-; circle predicate
+; circle prims + pred
 (define (make-circle x y rad)
   (list (list x y) rad))
-
 (define (get-center circle)
   (car circle))
 (define (get-radius circle)
   (cadr circle))
 
 (define (circle-predicate x y r)
-  (let (( circle (make-circle x y r)))
+  (let ((circle (make-circle x y r)))
     (let ((center (get-center circle)) (radius (get-radius circle)))
       (define (test-point point)
         (let ((x (get-x point)) (y (get-y point)) (cx (get-x center)) (cy (get-y center)))
