@@ -140,7 +140,7 @@
           (random-in-range (get-y (get-bottom-left rect)) (get-y (get-top-right rect)))))
   (let ()
     (define experiments-stream
-      (cons-stream (random-point-in-rect rect) (stream-map (lambda (x) (random-point-in-rect rect)) experiments-stream)))
+      (cons-stream (random-point-in-rect rect) (stream-map (apply (random-point-in-rect rect)) experiments-stream)))
     (monte-carlo (stream-map circle-pred experiments-stream) 0 0)))
 
 (define enclosed (estimate-integral (circle-predicate 0 0 1) (make-rectangle (make-point -2 -2) (make-point 2 2)))) 
