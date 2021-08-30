@@ -131,19 +131,30 @@
 ;  (cddr exp))
 
 ;; 4.3: Rewrite eval so dispatch is done in data-directed style
-(define (eval exp env)
-  (cond ((self-evaluating? exp) exp)
-        ((variable? exp) (lookup-variable-value exp env))
-        ((quoted? exp) (text-of-quotation exp))
-        ((assignment? exp) (eval-assignment exp env))
-        ((definition? exp) (eval-definition exp env))
-        ((if? exp) (eval-if exp env))
-        ((lambda? exp) (make-procedure (lambda-parameters exp) (lambda-body exp) env))
-        ((begin? exp) (eval-sequence (begin-actions exp) env))
-        ((cond? exp) (eval (cond->if exp) env))
-        ((application? exp) (apply (eval (operator exp) env) (list-of-values (operands exp) env)))
-        (else
-         (error "Unknown expression type: EVAL" exp))))
+(define operation-table make-table) 
+(define get (operation-table 'lookup-proc)) 
+(define put (operation-table 'insert-proc)) 
+
+; put tagged operations in table
+(put 'op 'quote text-of-quotation) 
+(put 'op 'set! eval-assignment) 
+(put 'op 'define eval-definition) 
+(put 'op 'if eval-if) 
+(put 'op 'lambda (lambda (x y)  
+                   (make-procedure (lambda-parameters x) (lambda-body x) y))) 
+(put 'op 'begin (lambda (x y)  
+                  (eval-sequence (begin-sequence x) y))) 
+(put 'op 'cond (lambda (x y)  
+                 (evaln (cond->if x) y)))
+
+(define (eval expr env)  
+  (cond ((self-evaluating? expr) expr)  
+        ((variable? expr) (lookup-variable-value expr env))  
+        ((get 'op (operator expr)) ((get 'op (operator expr)) expr env))  
+        ((application? expr)   
+         (apply (eval (operator expr) env)   
+                (list-of-values (operands expr) env)))  
+        (else (error "Unknown expression type -- EVAL" expr))))   
 
 ;; 4.4: eval-and and eval-or + show as derived expressions
 (define (first-predicate exps)
@@ -179,7 +190,7 @@
         ((true? (eval (first-predicate exps) env) #t))
         (else (eval-or (rest-predicates exps) env))))
 
-; derived expressions from if 
+; derived expressions for 'and' and 'or' from if 
 (define (and->if exp) 
   (expand-and-predicates (and-predicates exp))) 
 (define (expand-and-predicates predicates) 
