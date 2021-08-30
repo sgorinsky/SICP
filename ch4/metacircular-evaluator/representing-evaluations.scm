@@ -129,3 +129,41 @@
 ;  (cadr exp))
 ;(define (operands exp)
 ;  (cddr exp))
+
+;; 4.3: Rewrite eval so dispatch is done in data-directed style
+(define (eval exp env)
+  (cond ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp) (make-procedure (lambda-parameters exp) (lambda-body exp) env))
+        ((begin? exp) (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval (cond->if exp) env))
+        ((application? exp) (apply (eval (operator exp) env) (list-of-values (operands exp) env)))
+        (else
+         (error "Unknown expression type: EVAL" exp))))
+
+;; 4.4: eval-and and eval-or + show as derived expressions
+
+; and
+(define (and? exp)
+  (tagged-list? exp 'and))
+
+(define (eval-and exps env)
+  (if (false? (eval (first-exp exps) env))
+      false
+      (eval-and (rest-exps exps) env)))
+
+; or
+(define (or? exp)
+  (tagged-list? exp 'or))
+
+(define (eval-or exps env)
+  (if (true? (eval (first-exp exps) env))
+      true
+      (eval-or (rest-exps exps) env)))
+
+
+            
