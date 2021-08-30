@@ -176,8 +176,6 @@
         ((false? (eval (first-predicate exps) env) #f))
         (else (eval-and (rest-predicates exps) env))))
 
-(define (and->if
-
 ; or
 (define (or? exp)
   (tagged-list? exp 'or))
@@ -209,5 +207,33 @@
                'true
                (expand-predicates (rest-predicates predicates))))) 
 
+;; 4.5: Modify syntax of cond to support (⟨test⟩ => ⟨recipient⟩) syntax
+; ie. (cond ((assoc 'b '((a 1) (b 2))) => cadr)) returns 2
+(define (arrow clause)
+  (cadr clause))
+(define (arrow-clause? clause)
+  (eq? '=> (arrow clause)))
+
+(define (arrow-clause-predicate clause)
+  (car clause))
+(define (arrow-clause-proc clause)
+  (caddr clause))
+
+(define (expand-clauses clauses)
+  (if (null? clauses)
+      'false ; no else clause
+      (let ((first (car clauses)) (rest (cdr clauses)))
+        (if (cond-else-clause? first)
+            (if (null? rest)
+                (sequence->exp (cond-actions first))
+                (error "ELSE clause isn't last: COND->IF" clauses))
+
+            (if (arrow-clause? first) ; include check for => syntax
+                (make-if (arrow-clause-predicate first)
+                         ((arrow-clause-proc first) (arrow-clause-predicate first))
+                         (expand-clause rest))
+                (make-if (cond-predicate first)
+                         (sequence->exp (cond-actions first))
+                         (expand-clauses rest)))))))
 
             
