@@ -146,24 +146,57 @@
          (error "Unknown expression type: EVAL" exp))))
 
 ;; 4.4: eval-and and eval-or + show as derived expressions
+(define (first-predicate exps)
+  (car exps))
+(define (rest-predicates exps)
+  (cdr exps))
+(define (empty-predicates exps)
+  (null? exps))
 
 ; and
 (define (and? exp)
   (tagged-list? exp 'and))
 
+(define (and-predicates exps)
+  (cdr exp))
+
 (define (eval-and exps env)
-  (if (false? (eval (first-exp exps) env))
-      false
-      (eval-and (rest-exps exps) env)))
+  (cond ((empty-predicates exps) #t)
+        ((false? (eval (first-predicate exps) env) #f))
+        (else (eval-and (rest-predicates exps) env))))
+
+(define (and->if
 
 ; or
 (define (or? exp)
   (tagged-list? exp 'or))
 
+(define (or-predicates exps)
+  (cdr exp))
+
 (define (eval-or exps env)
-  (if (true? (eval (first-exp exps) env))
-      true
-      (eval-or (rest-exps exps) env)))
+  (cond ((empty-predicates exps) #f)
+        ((true? (eval (first-predicate exps) env) #t))
+        (else (eval-or (rest-predicates exps) env))))
+
+; derived expressions from if 
+(define (and->if exp) 
+  (expand-and-predicates (and-predicates exp))) 
+(define (expand-and-predicates predicates) 
+  (if (no-predicates? predicates) 
+      'true 
+      (make-if (first-predicate predicates) 
+               (expand-predicates (rest-predicates predicates)) 
+               'false))) 
+  
+(define (or->if exp) 
+  (expand-or-predicates (or-predicates exp))) 
+(define (expand-or-predicates predicates) 
+  (if (no-predicate? predicates) 
+      'false 
+      (make-if (first-predicate predicates) 
+               'true
+               (expand-predicates (rest-predicates predicates))))) 
 
 
             
