@@ -243,7 +243,7 @@
   (tagged-list? exp 'let))
 
 (define (let-params exp)
-  (map car (car exp))) ; same thing as commented out code below
+  (map car (cadr exp))) ; same thing as commented out code below
 ;  (define (iter-params list-of-assignments)
 ;    (if (null? list-of-assignments)
 ;        '()
@@ -261,6 +261,7 @@
 (define (let-body exp)
   (cddr exp))
 
+; transforming let expression into callable lambda expression with values for args
 (define (let->combinations exp)
   (cons (make-lambda (let-params exp) (let-body exp)) (let-values exp)))
 
