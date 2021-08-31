@@ -247,7 +247,7 @@
 ;  (define (iter-params list-of-assignments)
 ;    (if (null? list-of-assignments)
 ;        '()
-;        (cons (car list-of-assignments) (iter-params (cdr list-of-assignments)))))
+;        (cons (caar list-of-assignments) (iter-params (cdr list-of-assignments)))))
 ;  (iter-params (cadr exp)))
 
 (define (let-values exp)
@@ -255,7 +255,7 @@
 ;  (define (iter-values list-of-assignments)
 ;    (if (null? list-of-assignments)
 ;        '()
-;        (cons (cadr list-of-assignments) (iter-values (cdr list-of-assignments)))))
+;        (cons (cadar list-of-assignments) (iter-values (cdr list-of-assignments)))))
 ;  (iter-values (cadr exp)))
          
 (define (let-body exp)
