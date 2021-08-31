@@ -97,19 +97,19 @@
 
 ;; 4.2: Louis Reasoner wants to reorder application clause in eval before assignments clause
 ; recall original eval
-(define (eval exp env)
-  (cond ((self-evaluating? exp) exp)
-        ((variable? exp) (lookup-variable-value exp env))
-        ((quoted? exp) (text-of-quotation exp))
-        ((assignment? exp) (eval-assignment exp env))
-        ((definition? exp) (eval-definition exp env))
-        ((if? exp) (eval-if exp env))
-        ((lambda? exp) (make-procedure (lambda-parameters exp) (lambda-body exp) env))
-        ((begin? exp) (eval-sequence (begin-actions exp) env))
-        ((cond? exp) (eval (cond->if exp) env))
-        ((application? exp) (apply (eval (operator exp) env) (list-of-values (operands exp) env)))
-        (else
-         (error "Unknown expression type: EVAL" exp))))
+;(define (eval exp env)
+;  (cond ((self-evaluating? exp) exp)
+;        ((variable? exp) (lookup-variable-value exp env))
+;        ((quoted? exp) (text-of-quotation exp))
+;        ((assignment? exp) (eval-assignment exp env))
+;        ((definition? exp) (eval-definition exp env))
+;        ((if? exp) (eval-if exp env))
+;        ((lambda? exp) (make-procedure (lambda-parameters exp) (lambda-body exp) env))
+;        ((begin? exp) (eval-sequence (begin-actions exp) env))
+;        ((cond? exp) (eval (cond->if exp) env))
+;        ((application? exp) (apply (eval (operator exp) env) (list-of-values (operands exp) env)))
+;        (else
+;         (error "Unknown expression type: EVAL" exp))))
 
 ; a. What is wrong with this?
 ; Since all assignments are pairs that start with set! and definitions are pairs that start with define
@@ -236,4 +236,34 @@
                          (sequence->exp (cond-actions first))
                          (expand-clauses rest)))))))
 
+;; 4.6: lets are derived expressions: implement let->combination that reduces let expressions to proper lambdas then
+;;      add appropriate eval clause
+
+(define (let? exp)
+  (tagged-list? exp 'let))
+
+(define (let-params exp)
+  (map car (car exp))) ; same thing as commented out code below
+;  (define (iter-params list-of-assignments)
+;    (if (null? list-of-assignments)
+;        '()
+;        (cons (car list-of-assignments) (iter-params (cdr list-of-assignments)))))
+;  (iter-params (cadr exp)))
+
+(define (let-values exp)
+  (map cadr (cadr exp))) ; same as commented out code below
+;  (define (iter-values list-of-assignments)
+;    (if (null? list-of-assignments)
+;        '()
+;        (cons (cadr list-of-assignments) (iter-values (cdr list-of-assignments)))))
+;  (iter-values (cadr exp)))
+         
+(define (let-body exp)
+  (cddr exp))
+
+(define (let->combinations exp)
+  (cons (make-lambda (let-params exp) (let-body exp)) (let-values exp)))
+
+; include let clause in eval
+; ((let? exp) (eval (let-combinations exp) env))
             
