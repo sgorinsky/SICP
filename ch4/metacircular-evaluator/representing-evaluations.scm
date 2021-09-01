@@ -293,7 +293,9 @@
   (nested-lets (let*-pairs exp) (let*-body exp)))
 
 ; is adding (eval (let*->nested-lets exp) env) clause to eval enough?
-; No b/c initial call to let*->nested-lets requires that we know to evaluate let* params-vals pairs in order as nested-lets, so
-;    we need to know that we are converting a let* expression to a nested-let expression
+; Yes b/c initial call to let*->nested-lets requires that we evaluate let* as nested-lets.
+;    First call to let* will look like ('let (param-val-pairs) (...))
+;    So we basically convert let* to a let expression on that initial call and then recursively eval lets whose bodies are lets
+;        from let*->nested-lets conversion proc
   
             
