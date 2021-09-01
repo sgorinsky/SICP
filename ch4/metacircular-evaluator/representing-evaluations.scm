@@ -238,9 +238,11 @@
 
 ;; 4.6: lets are derived expressions: implement let->combination that reduces let expressions to proper lambdas then
 ;;      add appropriate eval clause
-
 (define (let? exp)
   (tagged-list? exp 'let))
+
+(define (make-let pairs-list body)
+  (list 'let pairs-list body))
 
 (define (let-params exp)
   (map car (cadr exp))) ; same thing as commented out code below
@@ -267,4 +269,31 @@
 
 ; include let clause in eval
 ; ((let? exp) (eval (let-combinations exp) env))
+
+;; 4.7: let* as a derived expression of nested lets
+(define (let*? exp)
+  (tagged-list exp 'let*))
+
+(define (let*-pairs exp)
+  (cadr exp))
+(define (let*-body exp)
+  (cddr exp))
+
+
+(define (first-pair pairs)
+  (car pairs))
+(define (rest-pairs pairs)
+  (cdr pairs))
+
+(define (let*->nested-lets exp)
+  (define (nested-lets pairs body)
+    (if (null? pairs)
+        body
+        (make-let (list (first-pair pairs)) (nested-lets (rest-pairs pairs) body))))
+  (nested-lets (let*-pairs exp) (let*-body exp)))
+
+; is adding (eval (let*->nested-lets exp) env) clause to eval enough?
+; No b/c initial call to let*->nested-lets requires that we know to evaluate let* params-vals pairs in order as nested-lets, so
+;    we need to know that we are converting a let* expression to a nested-let expression
+  
             

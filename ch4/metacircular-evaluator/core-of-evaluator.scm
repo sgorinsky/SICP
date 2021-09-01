@@ -48,7 +48,8 @@
   (cond ((last-exp? exps)
          (eval (first-exp exps) env))
         (else
-         (eval (first-exp exps) env) (eval-sequence (rest-exps exps) env))))
+         (eval (first-exp exps) env)
+         (eval-sequence (rest-exps exps) env))))
 
 ; handles assignments to variables, calls eval to find value to be assigned and transmits value
 (define (eval-assignment exp env)
