@@ -23,10 +23,12 @@
 ; define procs
 (define (definition? exp) (tagged-list? exp 'define))
 (define (definition-variable exp)
-  (if (symbol? (cadr exp)) (cadr exp)
+  (if (symbol? (cadr exp))
+      (cadr exp)
       (caadr exp)))
 (define (definition-value exp)
-  (if (symbol? (cadr exp)) (caddr exp)
+  (if (symbol? (cadr exp))
+      (caddr exp)
       (make-lambda (cdadr exp) ; formal parameters 
                    (cddr exp)))) ; body
 
@@ -298,4 +300,28 @@
 ;    So we basically convert let* to a let expression on that initial call and then recursively eval lets whose bodies are lets
 ;        from let*->nested-lets conversion proc
   
-            
+
+; 4.8: Handle (let ⟨var⟩ ⟨bindings⟩ ⟨body⟩) in let->combinations
+(define (named-let-var exp)
+  (cadr exp))
+(define (named-let-bindings exp)
+  (caddr exp))
+(define (named-let-body exp)
+  (cdddr exp))
+
+(define (make-define var-name params body)
+  (if params
+      (list 'define (list var-name params) body)
+      (list 'define var-name body)))
+
+(define (let->combos exp)
+  (if (<= (length exp) 3)
+      (cons (make-lambda
+             (let-params exp) (let-body exp))
+            (let-values exp))
+      (cons ((make-define
+              (named-let-var exp) (let-params (named-let-bindings exp)) (named-let-body exp))
+             (let-values (named-let-bindings exp))))))
+      
+      
+      
