@@ -301,11 +301,17 @@
 ;        from let*->nested-lets conversion proc
   
 
-; 4.8: Handle (let ⟨var⟩ ⟨bindings⟩ ⟨body⟩) in let->combinations
+; 4.8: Handle (let ⟨var⟩ ⟨bindings⟩ ⟨body⟩) in amended let->combinations
+(define (named-let? exp)
+  (and (let? exp) (symbol? (cadr exp))))
 (define (named-let-var exp)
   (cadr exp))
 (define (named-let-bindings exp)
   (caddr exp))
+(define (named-let-params exp)
+  (map car (named-let-bindings exp)))
+(define (named-let-vals exp)
+  (map cadr (named-let-bindings exp)))
 (define (named-let-body exp)
   (cdddr exp))
 
@@ -315,13 +321,13 @@
       (list 'define var-name body)))
 
 (define (let->combos exp)
-  (if (<= (length exp) 3)
+  (if (named-let? exp)
+      (cons ((make-define
+              (named-let-var exp) (named-let-params exp) (named-let-body exp))
+             (named-let-vals exp)))
       (cons (make-lambda
              (let-params exp) (let-body exp))
-            (let-values exp))
-      (cons ((make-define
-              (named-let-var exp) (let-params (named-let-bindings exp)) (named-let-body exp))
-             (let-values (named-let-bindings exp))))))
+            (let-values exp))))
       
       
       
