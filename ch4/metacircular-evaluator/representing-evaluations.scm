@@ -19,6 +19,8 @@
 (define (assignment? exp) (tagged-list? exp 'set!))
 (define (assignment-variable exp) (cadr exp))
 (define (assignment-value exp) (caddr exp))
+(define (make-assignment var val)
+  (list 'set! var val)
 
 ; define procs
 (define (definition? exp) (tagged-list? exp 'define))
@@ -328,6 +330,30 @@
       (cons (make-lambda
              (let-params exp) (let-body exp))
             (let-values exp))))
-      
-      
-      
+
+;; 4.9: Iteration constructs do, for, while, until
+(define (iter? exp)
+  (tagged-list? exp 'iter))
+
+(define (init-var exp)
+  (cadr exp))
+
+(define (end-var exp)
+  (caddr exp))
+
+(define (proc exp)
+  (cdddr exp))
+
+(define (iter->combination exp)
+  (make-let
+   (list (list start (init-var exp)) (list end (end-var exp)) (list proc (body exp))) ; params
+   (make-if
+    (>= start end) ; iter-predicate
+    'end-loop
+    (make-begin ; body of predicate
+     (make-assignment start (+ start 1)) ; increment
+     (proc))
+    )))
+
+; add eval clause
+; ((iter? exp) (eval (iter->combination exp) env))
