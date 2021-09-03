@@ -346,17 +346,22 @@
 
 (define (iter->combination exp)
   (make-let
-   (list (list start (init-var exp)) (list end (end-var exp)) (list proc (body exp))) ; let params
+   (list (list start (init-var exp))
+         (list end (end-var exp))
+         (list proc (body exp)))
    (make-define
     'iter
     '() ; iter-proc params
-    (make-if
-     (>= start end) ; iter-predicate
-     'end-loop
-     (make-begin ; body of predicate
-      (make-assignment start (+ start 1)) ; increment
-      (proc)
-      iter)))))
+    (make-lambda
+     '() 
+     (make-if
+      (>= start end) ; iter-predicate
+      'end-loop
+      (sequence->exp ; body of predicate
+       (list
+        (make-assignment start (+ start 1)) ; increment
+        (proc)
+        'iter)))))))
 
 ; add eval clause
 ; ((iter? exp) (eval (iter->combination exp) env))
