@@ -20,7 +20,7 @@
 (define (assignment-variable exp) (cadr exp))
 (define (assignment-value exp) (caddr exp))
 (define (make-assignment var val)
-  (list 'set! var val)
+  (list 'set! var val))
 
 ; define procs
 (define (definition? exp) (tagged-list? exp 'define))
@@ -364,4 +364,27 @@
         'iter)))))))
 
 ; add eval clause
-; ((iter? exp) (eval (iter->combination exp) env))
+; ((iter? exp) (eval (iter->combination exp) env)))
+
+;; 4.10: Design and implement new language w/o changing eval or apply
+; Basically just depends on predicates, getters, selectors, derived procs. All we would have to do is modify which part of special
+;     forms mean what.
+
+; ie. we could change to postfix notation by ensuring tags are at ends of lists
+
+;(define (get-last exp)
+;  (if (null? (cdr exp))
+;      (car exp)
+;      (get-last (cdr exp))))
+
+;(define (tagged-list? exp tag)
+;  (eq? (get-last exp) tag))
+
+;(define (if? exp)
+;  (tagged-list exp 'if))
+
+;(define (make-if predicate consequent alternative)
+;  (list predicate consequent alternative 'if))
+
+; ... and so on
+
