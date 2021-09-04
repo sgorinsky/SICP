@@ -1,6 +1,6 @@
 #lang sicp
 
-;; predicate testing
+;; handling predicates
 (define (true? x) (not (eq? x false)))
 (define (false? x) (eq? x false))
 
@@ -21,9 +21,10 @@
 (define (frame-variables frame) (car frame))
 (define (frame-values frame) (cdr frame))
 (define (add-binding-to-frame! var val frame)
-  (set-car! frame (cons var (car frame))) (set-cdr! frame (cons val (cdr frame))))
+  (set-car! frame (cons var (car frame)))
+  (set-cdr! frame (cons val (cdr frame))))
 
-; make frame of lists of vars and vals
+; adjoin frame of lists of vars and vals to new env
 (define (extend-environment vars vals base-env)
   (if (= (length vars) (length vals))
       (cons (make-frame vars vals) base-env)
@@ -66,4 +67,20 @@
             (else (scan (cdr vars) (cdr vals)))))
     (scan (frame-variables frame) (frame-values frame))))
 
+;; 4.11: instead of representing frames as pairs of lists, can represent frames as list of bindings -- rewrite env operations
+(define (create-frame vars vals)
+  (map car vars vals))
 
+(define (frame-vars frame)
+  (map car frame))
+
+(define (frame-vals frame)
+  (map cadr frame))
+
+(define (add-binding-to-frame! var val frame)
+  (set-car! frame (cons (list var val) frame)))
+
+; extend-env is abstracted out
+; lookups are too, just replace frame-variables and frame-values w frame-vars and frame-vals
+;     there are probably more efficient lookups that don't include the call to map in frame-vars and frame-vals but we only need
+;     replace primitives and can keep our env handling working
