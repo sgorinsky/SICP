@@ -105,7 +105,7 @@
       #f ; soft erroring
       (scan (first-frame env))))
 
-; much more concise
+; look, much more concise
 (define (lookup-var-val var env)
   (let ((pair (search-envs var env)))
     (if pair
@@ -123,6 +123,30 @@
     (if pair
         (set-cdr! pair val)
         (add-binding-to-frame! var val (first-frame env)))))
+
+;; 4.13: make-unbound! proc to unset vars in env
+(define (make-unbound! var env)
+  (let ((found-var #f))
+    (define (unbind-frame-var var frame)
+      (cond ((null? frame) (make-unbound var (cdr env)))
+            (else
+             (let ((first (first-pair frame)))
+               (if (eq? var (car first))
+                   (begin
+                     (if (null? (rest-pairs frame))
+                         (set-car! frame '())
+                         (let ((next (first-pair (rest-pairs frame))))
+                           (begin
+                             (set-car! frame next)
+                             (set-cdr! frame (cddr frame)))))
+                     (set! found-var #t)
+                     (make-unbound! var (rest-frames env)))
+                   (unbind-frame-var var (rest-pairs frame)))))))
+    (if (null? env)
+        (if found-var
+            'done
+            (error "Unbound var: " var))
+        (unbind-frame-var var (first-frame env)))))
 
 
       
