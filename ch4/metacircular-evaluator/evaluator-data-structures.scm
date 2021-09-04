@@ -80,7 +80,49 @@
 (define (add-binding-to-frame! var val frame)
   (set-car! frame (cons (list var val) frame)))
 
+(define (first-frame envs)
+  (car envs))
+(define (rest-frames envs)
+  (cdr envs))
+(define (first-pair frame)
+  (car frame))
+(define (rest-pairs frame)
+  (cdr frame))
+
 ; extend-env is abstracted out
 ; lookups are too, just replace frame-variables and frame-values w frame-vars and frame-vals
 ;     there are probably more efficient lookups that don't include the call to map in frame-vars and frame-vals but we only need
 ;     replace primitives and can keep our env handling working
+
+;; 4.12: Create abstractions for lookup-variable-value, set-variable-value!, define-variable!
+;        --> really just need to abstract out env-loop and scan
+(define (search-envs var envs)
+  (define (scan frame) ; could use assq for implementation but would look cluttered w/ if clauses
+    (cond ((null? frame) (search-envs var (rest-frames env)))
+          ((eq? var (car (first-pair frame))) (first-pair frame))
+          (else (scan (rest-pairs frame)))))
+  (if (null? envs)
+      #f ; soft erroring
+      (scan (first-frame env))))
+
+; much more concise
+(define (lookup-var-val var env)
+  (let ((pair (search-envs var env)))
+    (if pair
+        pair
+        (error "Unbound global var: " var))))
+
+(define (set-var-val! var val env)
+  (let ((pair (search-envs var env)))
+    (if pair
+        (set-cdr! pair val)
+        (error "Unbound variable: SET!" var))))
+
+(define (define-var! var val env)
+  (let ((pair (search-envs var env)))
+    (if pair
+        (set-cdr! pair val)
+        (add-binding-to-frame! var val (first-frame env)))))
+
+
+      
