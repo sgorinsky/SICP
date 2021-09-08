@@ -44,17 +44,25 @@
 ;    (set! v ⟨e2⟩)
 ;    ⟨e3⟩))
 
-; assume assignment, define, lambda, let procs from representing-evaluations 4.1.4
+; assume assignment, define, lambda, let procs from representing-expressions 4.1.2
 ; scan-out-defines: create a let expression where the define vars are created as params in a let expression and the let's body
 ;                   has the other expressions appended to the list of assignments of the define-vars to define-vals
 (define (scan-out-defines proc-body)
-  (let ((defines (filter define? proc-body)) (no-defines (filter (lambda (exp) (not (define? exp))) proc-body)))
+  (let ((defines (filter define? proc-body))
+        (no-defines (filter (lambda (exp) (not (define? exp))) proc-body)))
     (make-let
      (map (lambda (exp) (list (define-var exp) '*unassigned*)) defines)
      (append
       (map (lambda (exp) (make-assignment (define-var exp) (define-val exp))) defines)
       no-defines))))
 
-  
+; c. Install scan-out-defines either in make-procedure or procedure-body. Which is better? Why?
 
- 
+; Recall:
+; (define (procedure-body p) (caddr p))
+; vs.
+; (define (make-procedure parameters body env) (list 'procedure parameters body env))
+
+; Better to install scan-out-defines in make-procedure so every call to make-procedure, including derived procs, would
+;     transform bodies. This keeps effects intentional. In order not to break abstraction barriers as well, 
+;     procedure-body is selector, and selecting while transforming proc body would have unintended consequences.
