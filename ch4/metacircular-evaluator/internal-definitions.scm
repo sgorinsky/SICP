@@ -28,5 +28,33 @@
          pair)
         (error "Unbound global var: " var))))
 
+; b. Write a proc scan-out-defines that transforms a proc body into one w/o internal proc defines as laid out in 4.1.6
+
+; Transform:
+;(lambda ⟨vars⟩
+;  (define u ⟨e1⟩)
+;  (define v ⟨e2⟩)
+;  ⟨e3⟩)
+
+; into:
+;(lambda ⟨vars⟩
+;  (let ((u '*unassigned*)
+;        (v '*unassigned*))
+;    (set! u ⟨e1⟩)
+;    (set! v ⟨e2⟩)
+;    ⟨e3⟩))
+
+; assume assignment, define, lambda, let procs from representing-evaluations 4.1.4
+; scan-out-defines: create a let expression where the define vars are created as params in a let expression and the let's body
+;                   has the other expressions appended to the list of assignments of the define-vars to define-vals
+(define (scan-out-defines proc-body)
+  (let ((defines (filter define? proc-body)) (no-defines (filter (lambda (exp) (not (define? exp))) proc-body)))
+    (make-let
+     (map (lambda (exp) (list (define-var exp) '*unassigned*)) defines)
+     (append
+      (map (lambda (exp) (make-assignment (define-var exp) (define-val exp))) defines)
+      no-defines))))
+
+  
 
  
