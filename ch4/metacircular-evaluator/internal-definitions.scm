@@ -78,4 +78,5 @@
 ;; Design a way to make the interpreter implement the “simultaneous” scope rule for internal definitions
 ;;    without constructing the extra frame.
 
-; So basically, w/o let... just replace defines in original w/ set! instead of introducing let expression
+; So basically, w/o let... just replace defines in original w/ set! instead of introducing let expression and make each var
+;    (define var '*unassigned*) at top of so set! doesn't access unbound vars
