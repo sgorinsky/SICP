@@ -66,3 +66,13 @@
 ; Better to install scan-out-defines in make-procedure so every call to make-procedure, including derived procs, would
 ;     transform bodies. This keeps effects intentional. In order not to break abstraction barriers as well, 
 ;     procedure-body is selector, and selecting while transforming proc body would have unintended consequences.
+
+;; 4.17: What does env model look like for evaluation of ⟨e3⟩? Why will extra frame created not matter?
+
+; So the body of the original proc is the lambda expression, but now the ⟨e3⟩ expression will be invoked in a separate env
+;    where the ⟨e3⟩ expression will be invoked from that one
+; There is an extra env b/c of the let expression but it doesn't matter b/c the defines that were scanned out were local to
+;    the proc's original instantiation anyway
+
+
+
