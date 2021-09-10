@@ -80,3 +80,35 @@
 
 ; So basically, w/o let... just replace defines in original w/ set! instead of introducing let expression and make each var
 ;    (define var '*unassigned*) at top of so set! doesn't access unbound vars
+
+
+;; 4.18: Will following representation of internal procs work for solve below?
+;(lambda ⟨vars⟩
+;  (let ((u '*unassigned*) (v '*unassigned*))
+;    (let ((a ⟨e1⟩) (b ⟨e2⟩))
+;      (set! u a)
+;      (set! v b))
+;    ⟨e3⟩))
+
+;(define (solve f y0 dt)
+;  (define y (integral (delay dy) y0 dt))
+;  (define dy (stream-map f y))
+;  y)
+
+; Recall definition for integral from ex 3.77
+;(define (integral delayed-integrand initial-value dt)
+;  (cons-stream
+;   initial-value
+;   (let ((integrand (force delayed-integrand)))
+;     (if (stream-null? integrand)
+;         the-empty-stream
+;         (integral (delay (stream-cdr integrand))
+;                   (+ (* dt (stream-car integrand)) initial-value)
+;                   dt)))))
+
+; So with the solve proc, we're delaying the evaluation of dy until y is called which it is on define dy's (stream-map f y).
+;    This means that because (delay dy) is a promise, it must be forced on the function init to throw an error,
+;    which we can see happens in the inegral proc's let clause. Therefore, even though the integral proc still expects a
+;    promise as its first arg, it will force it on the function's definition and thus,
+;    the internal procs fail when they're defined with the new representation of internal defines
+
