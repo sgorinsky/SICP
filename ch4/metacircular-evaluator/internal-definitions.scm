@@ -112,7 +112,7 @@
 ;    promise as its first arg, it will force it on the function's definition and thus,
 ;    the internal procs fail when they're defined with the new representation of internal defines
 
-; 4.19: What is the result of the following expression? Ben Bitdiddle says 16, Alyssa P Hacker says error, Eva Lu Ator says 20
+;; 4.19: What is the result of the following expression? Ben Bitdiddle says 16, Alyssa P Hacker says error, Eva Lu Ator says 20
 
 ;(let ((a 1))
 ;  (define (f x)
@@ -152,3 +152,12 @@
     (define b (+ a x))
     (+ a b))
   (f 10))
+
+;; 4.20: Implement letrec where all bindings are created simultaneously
+; a. As derived expression from let expression shown in 4.18
+(define (make-letrec vars exps body)
+  (make-let
+   (map (lambda (var) (list var '*unassigned)) vars)
+   (append
+    (map (lambda pair (make-assignment (car pair) (cadr pair))) vars exps)
+    body)))
