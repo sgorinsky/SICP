@@ -137,14 +137,15 @@
 ;    But that is left to the implementation of the procedure, not the implementation of handling internal definitions, so it
 ;    would work in this case, but likely not others.
 
-; Simply:
+; simultaneous:
 (let ((a 1))
   (define (f x)
     (define b (delay (+ a x)))
     (define a 5)
     (+ a (force b)))
   (f 10))
-; or
+
+; sequential:
 (let ((a 1))
   (define (f x)
     (define a 5)
