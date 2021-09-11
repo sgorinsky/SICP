@@ -112,3 +112,22 @@
 ;    promise as its first arg, it will force it on the function's definition and thus,
 ;    the internal procs fail when they're defined with the new representation of internal defines
 
+; 4.19: What is the result of the following expression? Louis Reasoner says 16, Alyssa P Hacker says error, Eva Lu Ator says 20
+
+;(let ((a 1))
+;  (define (f x)
+;    (define b (+ a x))
+;    (define a 5)
+;    (+ a b))
+;  (f 10))
+
+; a. Who is right?
+; If we take this at face-value and assume there is some way that internal procs are simultaneously defined, then Eva is right,
+;    the result would be 20 since b would take a's value when it is defined and then sub that value into the body of f which would
+;    be (+ a b) -> (+ a (+ a 10)) -> (+ 5 (5 10)) -> 20
+; However, this is an ideal that isn't implemented with our scan-out-defines in 4.16. Since b expects a value for a and not some
+;    proc, it passes the value for that would be defined within the body of f's scanned-out let procedure, which would be
+;    '*unassigned*, and since that value can't be evaluated in (+ '*unassigned 10), the proc would throw an error
+
+
+
