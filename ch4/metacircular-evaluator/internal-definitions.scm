@@ -155,9 +155,30 @@
 
 ;; 4.20: Implement letrec where all bindings are created simultaneously
 ; a. As derived expression from let expression shown in 4.18
-(define (make-letrec vars exps body)
-  (make-let
-   (map (lambda (var) (list var '*unassigned)) vars)
-   (append
-    (map (lambda pair (make-assignment (car pair) (cadr pair))) vars exps)
-    body)))
+(define (letrec? exp) (tagged-list exp 'let-rec))
+(define (var-name pair) (car pair))
+(define (var-val pair) (cadr pair))
+(define (var-val-pairs exp)
+  (cadr exp))
+(define (let-rec-body exp)
+  (cddr exp))
+(define (letrec->let exp)
+  (let ((var-vals (var-val-pairs exp)) (body (let-rec-body exp)))
+    (let ((vars (map var-name var-vals)) (vals (map var-val var-vals)))
+      (make-let
+       (map (lambda (var) (list var '*unassigned)) vars)
+       (append
+        (map (lambda pair (make-assignment (car pair) (cadr pair))) vars vals)
+        body)))))
+
+; b. What does Louis Reasoner's proposal, that we can just stick lets in if proc bodies if we don't like internal defines, env 
+;    model look like?
+
+(define (f x)
+  (letrec
+      ((even? (lambda (n)
+                (if (= n 0) true (odd? (- n 1)))))
+       (odd? (lambda (n)
+               (if (= n 0) false (even? (- n 1))))))
+    ⟨rest of body of f⟩))
+; If we use let instead of internal defines, then the expressions are assigned to the let vars simultaneously.
