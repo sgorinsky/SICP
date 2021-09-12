@@ -201,3 +201,23 @@
         (cond ((= k 0) 0)
               ((= k 1) 1)
               (else (+ (fn fn (- k 1)) (fn fn (- k 2)))))))))
+
+; b: Fill in blanks to create f using y operator
+;(define (f x)
+;  (define (even? n)
+;    (if (= n 0) true (odd? (- n 1))))
+;  (define (odd? n)
+;    (if (= n 0) false (even? (- n 1))))
+;  (even? x))
+
+(define (f x)
+  ((lambda (even? odd?)
+     (even? even? odd? x))
+   (lambda (ev? od? n)
+     (if (= n 0)
+         true
+         (od? ev? od? (- n 1))))
+   (lambda (ev? od? n)
+     (if (= n 0)
+         false
+         (ev? ev? od? (- n 1))))))
