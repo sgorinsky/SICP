@@ -182,3 +182,22 @@
                (if (= n 0) false (even? (- n 1))))))
     ⟨rest of body of f⟩))
 ; If we use let instead of internal defines, then the expressions are assigned to the let vars simultaneously.
+
+;; 4.21: Y operator!
+; look at factorial below defined in terms of recursive lambdas
+(define factorial
+  (lambda (n)
+     ((lambda (fact) (fact fact n))
+      (lambda (ft k)
+        (if (= k 1)
+            1
+            (* k (ft ft (- k 1))))))))
+
+; a: Devise an analogous expression for computing fibonacci numbers
+(define fib
+  (lambda (n)
+     ((lambda (fib) (fib fib n))
+      (lambda (fn k)
+        (cond ((= k 0) 0)
+              ((= k 1) 1)
+              (else (+ (fn fn (- k 1)) (fn fn (- k 2)))))))))
