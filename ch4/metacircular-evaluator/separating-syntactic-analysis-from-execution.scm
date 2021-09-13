@@ -97,3 +97,35 @@
 ; let clause in analyze:
 ; ((let? exp) (analyze-let exp))
 
+;; 4.23: Compare Alyssa Hacker's implementation of analyze-sequence and the one above
+
+; Alyssa's: 
+;(define (analyze-sequence exps)
+;  (define (execute-sequence procs env)
+;    (cond ((null? (cdr procs)) ((car procs) env))
+;          (else ((car procs) env) (execute-sequence (cdr procs) env))))
+;  (let ((procs (map analyze exps)))
+;    (if (null? procs)
+;        (error "Empty sequence: ANALYZE"))
+;    (lambda (env)
+;      (execute-sequence procs env))))
+
+; text's:
+;(define (analyze-sequence exps)
+;  (define (sequentially proc1 proc2)
+;    (lambda (env) (proc1 env) (proc2 env)))
+;  (define (loop first-proc rest-procs)
+;    (if (null? rest-procs)
+;        first-proc
+;        (loop (sequentially first-proc (car rest-procs)) (cdr rest-procs))))
+;  (let ((procs (map analyze exps)))
+;    (if (null? procs) (error "Empty sequence: ANALYZE"))
+;    (loop (car procs) (cdr procs))))
+
+; Text's implementation handles two procs at once w/ sequentially and is a little more complicated as a result while Alyssa's
+;    is a lot simpler and merely loops through all the procs and only executes the first proc in the sequence of procs at a time.
+; For an expression with only one procedure, they both execute the first-proc similarly, but for an expression with two or more
+;    procs, the text's execution kind of accumulates the procs in the env and executes them in the expressions.
+; The outcome of this "accumulation" are avoiding the unnecessary calls to execute-sequence in Alyssa's proc. In the text's
+;    implementation, as the program loops through the procs, it evaluates them and saves the proc in place in the first arg instead
+;    of needing to execute each proc again ang again like in Alyssa's implementation.
