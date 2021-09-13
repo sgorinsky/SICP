@@ -241,11 +241,11 @@
   (tagged-list? exp 'and))
 
 (define (and-predicates exps)
-  (cdr exp))
+  (cdr exps))
 
 (define (eval-and exps env)
-  (cond ((empty-predicates exps) #t)
-        ((false? (eval (first-predicate exps) env)) #f)
+  (cond ((empty-predicates exps) true)
+        ((false? (eval (first-predicate exps) env)) false)
         (else (eval-and (rest-predicates exps) env))))
 
 ; or
@@ -253,34 +253,35 @@
   (tagged-list? exp 'or))
 
 (define (or-predicates exps)
-  (cdr exp))
+  (cdr exps))
 
 (define (eval-or exps env)
-  (cond ((empty-predicates exps) #f)
-        ((true? (eval (first-predicate exps) env)) #t)
+  (cond ((empty-predicates exps) false)
+        ((true? (eval (first-predicate exps) env)) true)
         (else (eval-or (rest-predicates exps) env))))
 
 ; derived expressions for 'and' and 'or' from if
 (define (no-predicates? predicates)
   (null? predicates))
 
-(define (and->if exp) 
-  (expand-and-predicates (and-predicates exp))) 
 (define (expand-and-predicates predicates) 
   (if (no-predicates? predicates) 
       'true 
       (make-if (first-predicate predicates) 
                (expand-and-predicates (rest-predicates predicates)) 
                'false))) 
-  
-(define (or->if exp) 
-  (expand-or-predicates (or-predicates exp))) 
+
+(define (and->if exp) 
+  (expand-and-predicates (and-predicates exp)))
+ 
 (define (expand-or-predicates predicates) 
   (if (no-predicates? predicates) 
       'false 
       (make-if (first-predicate predicates) 
                'true
-               (expand-or-predicates (rest-predicates predicates))))) 
+               (expand-or-predicates (rest-predicates predicates)))))
+(define (or->if exp) 
+  (expand-or-predicates (or-predicates exp)))
 
 ;; 4.5: Modify syntax of cond to support (⟨test⟩ => ⟨recipient⟩) syntax
 ; ie. (cond ((assoc 'b '((a 1) (b 2))) => cadr)) returns 2
@@ -473,6 +474,10 @@
    (list 'null? null?)
    (list '() '())
    (list 'list list)
+   (list '+ +)
+   (list '- -)
+   (list '* *)
+   (list '/ /)
    ; ⟨more primitives⟩
    ))
 
@@ -508,15 +513,23 @@
 (define (driver-loop)
   (prompt-for-input input-prompt)
   (let ((input (read)))
-    (let ((output (eval input the-global-environment)))
-      (announce-output output-prompt)
-      (user-print output)))
-  (driver-loop))
-
+    (if (eq? input 'exit)
+        (display "exited metacircular-evaluator")
+        (let ((output (eval input the-global-environment)))
+          (announce-output output-prompt)
+          (user-print output)
+          (driver-loop)))))
+        
 (define (prompt-for-input string)
-  (newline) (newline) (display string) (newline))
+  (newline)
+  (newline)
+  (display string)
+  (newline))
+
 (define (announce-output string)
-  (newline) (display string) (newline))
+  (newline)
+  (display string)
+  (newline))
 
 
 ; eval checks for primitive expressions and special forms
@@ -524,9 +537,12 @@
   (cond ((self-evaluating? exp) exp)
         ((variable? exp) (lookup-variable-value exp env))
         ((quoted? exp) (text-of-quotation exp))
-        ((assignment? exp) (eval-assignment exp env))
+        ((or? exp) (eval-or (or-predicates exp) env))
+        ((and? exp) (eval-and (and-predicates exp) env))
+        ((assignment? exp) (eval-assignment (or-predicates exp) env))
         ((definition? exp) (eval-definition exp env))
         ((if? exp) (eval-if exp env))
+        ((let? exp) (eval (let->combinations exp) env))
         ((lambda? exp) (make-procedure (lambda-parameters exp) (lambda-body exp) env))
         ((begin? exp) (eval-sequence (begin-actions exp) env))
         ((cond? exp) (eval (cond->if exp) env))
@@ -549,5 +565,7 @@
            (procedure-environment procedure))))
         (else (error
                "Unknown procedure type: APPLY" procedure))))
+
+(driver-loop)
 
 

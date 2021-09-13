@@ -234,7 +234,7 @@
             (if (arrow-clause? first) ; include check for => syntax
                 (make-if (arrow-clause-predicate first)
                          ((arrow-clause-proc first) (arrow-clause-predicate first))
-                         (expand-clause rest))
+                         (expand-clauses rest))
                 (make-if (cond-predicate first)
                          (sequence->exp (cond-actions first))
                          (expand-clauses rest)))))))
@@ -271,7 +271,7 @@
   (cons (make-lambda (let-params exp) (let-body exp)) (let-values exp)))
 
 ; include let clause in eval
-; ((let? exp) (eval (let-combinations exp) env))
+; ((let? exp) (eval (let->combinations exp) env))
 
 ;; 4.7: let* as a derived expression of nested lets
 (define (let*? exp)
