@@ -1,4 +1,7 @@
 #lang sicp
+(define (self-evaluating? exp)
+  (cond ((number? exp) true)
+        ((string? exp) true) (else false)))
 
 ; eval checks for primitive expressions and special forms
 (define (eval exp env)

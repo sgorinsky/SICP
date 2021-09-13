@@ -129,3 +129,5 @@
 ; The outcome of this "accumulation" are avoiding the unnecessary calls to execute-sequence in Alyssa's proc. In the text's
 ;    implementation, as the program loops through the procs, it evaluates them and saves the proc in place in the first arg instead
 ;    of needing to execute each proc again ang again like in Alyssa's implementation.
+
+;; 4.24: Run some experiments to compare speed of original metacircular evaluator and one in this section!

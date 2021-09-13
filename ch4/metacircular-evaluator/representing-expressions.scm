@@ -5,7 +5,6 @@
   (cond ((number? exp) true)
         ((string? exp) true) (else false)))
 
-
 ; atoms
 (define (variable? exp) (symbol? exp))
 (define (quoted? exp) (tagged-list? exp 'quote))
