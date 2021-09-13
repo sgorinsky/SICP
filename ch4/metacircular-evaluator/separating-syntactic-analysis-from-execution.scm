@@ -78,6 +78,7 @@
        (fproc env)
        (map (lambda (aproc) (aproc env))
             aprocs)))))
+
 (define (execute-application proc args)
   (cond ((primitive-procedure? proc) (apply-primitive-procedure proc args))
         ((compound-procedure? proc)
@@ -87,4 +88,12 @@
         (else
          (error "Unknown procedure type: EXECUTE-APPLICATION"
                 proc))))
+
+;; 4.22: analyze-let
+; we can just transform a let to a lambda and analyze that i believe
+(define (analyze-let exp)
+  (analyze-lambda (let->combinations exp)))
+
+; let clause in analyze:
+; ((let? exp) (analyze-let exp))
 
