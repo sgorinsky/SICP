@@ -1,6 +1,12 @@
 #lang sicp
 ;;; implementation of metacircular-evaluator
 
+; tagged-list
+(define (tagged-list? exp tag)
+  (if (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
 ;; abstractions for expressions
 ; only numbers and strings are self-evaluating
 (define (self-evaluating? exp)
@@ -11,10 +17,6 @@
 (define (variable? exp) (symbol? exp))
 (define (quoted? exp) (tagged-list? exp 'quote))
 (define (text-of-quotation exp) (cadr exp))
-(define (tagged-list? exp tag)
-  (if (pair? exp)
-      (eq? (car exp) tag)
-      false))
 
 ;; assignments
 (define (assignment? exp) (tagged-list? exp 'set!))
