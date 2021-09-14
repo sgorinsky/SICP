@@ -531,7 +531,6 @@
   (display string)
   (newline))
 
-
 ; eval checks for primitive expressions and special forms
 (define (eval exp env)
   (cond ((self-evaluating? exp) exp)
