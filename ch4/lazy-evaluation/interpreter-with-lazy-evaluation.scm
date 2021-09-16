@@ -68,5 +68,16 @@
 ; consider removing procs after thinks evaluated and values stored to avoid excess memory storage
 ; ie. (set! proc '())
 
+;; 4.27 Suppose we define count and id in lazy interpreter, give missing values and explain
+(define count 0)
+(define (id x)
+  (set! count (+ count 1))
+  x)
 
-
+(define w (id (id 10)))
+;;; L-Eval input: count
+;;; L-Eval value: ⟨response⟩ ; -> 1 ;; w not fully evaluated yet, only inner id called
+;;; L-Eval input: w
+;;; L-Eval value: ⟨response⟩ ; -> 10 ;; evaluates w and returns 10
+;;; L-Eval input: count
+;;; L-Eval value: ⟨response⟩ ; -> 2 ;; since (set! count (+ count 1)) in body of id evaluated twice when w was called
