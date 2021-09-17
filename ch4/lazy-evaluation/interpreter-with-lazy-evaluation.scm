@@ -1,5 +1,10 @@
 #lang sicp
 
+;; application clause of eval becomes:
+;((application? exp)
+;(apply (actual-value (operator exp) env)
+;        (operands exp)
+;        env))
 ;; whenever we need actual value of expression, force eval
 (define (actual-value exp env)
   (force-it (eval exp env)))
@@ -81,3 +86,8 @@
 ;;; L-Eval value: ⟨response⟩ ; -> 10 ;; evaluates w and returns 10
 ;;; L-Eval input: count
 ;;; L-Eval value: ⟨response⟩ ; -> 2 ;; since (set! count (+ count 1)) in body of id evaluated twice when w was called
+
+;; 4.28: Provide example where actual-value is needed to force proc instead of eval
+; Needed whenever a thunk hasn't been evaluated yet so if a proc is passed as a param into another function, then it will be
+;    represented as a thunk
+; ie. (define (f g h x) (g h x))
