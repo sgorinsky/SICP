@@ -91,3 +91,28 @@
 ; Needed whenever a thunk hasn't been evaluated yet so if a proc is passed as a param into another function, then it will be
 ;    represented as a thunk
 ; ie. (define (f g h x) (g h x))
+
+;; 4.29: Offer example program that would run much faster with memoization than without
+(define (fibonacci n)
+  ((lambda (fib) (fib fib n))
+   (lambda (f k)
+     (cond ((= k 0) 0)
+           ((= k 1) 1)
+           (else (+ (f f (- k 1)) (f f (- k 2))))))))
+
+; offer outputs for when following program memoizes and doesn't
+
+; memo
+; (define (square x) (* x x)) -> (* (force-it (id 10)) (force-it (id 10))) -> (* (unmemoized (id 10)) (memoized (id 10)))
+
+;;; L-Eval input: (square (id 10))
+;;; L-Eval value: ⟨response⟩ -> 100
+;;; L-Eval input: count
+;;; L-Eval value: ⟨response⟩ -> 1
+
+; no memo
+; (define (square x) (* x x)) -> (* (unmemoized (id 10)) (unmemoized (id 10)))
+;;; L-Eval input: (square (id 10))
+;;; L-Eval value: ⟨response⟩ -> 100
+;;; L-Eval input: count
+;;; L-Eval value: ⟨response⟩ -> 2
