@@ -133,3 +133,24 @@
 
 ; a. The force-it in actual-value is redundant in Bitdiddle's for-each where each element is displayed b/c display is a primitive
 ;    proc that prints to stdout and doesn't return anything
+
+; b. Cy creates two procs. What are the outputs like with original eval-sequence and Cy's eval-sequence?
+
+(define (p1 x)
+  (set! x (cons x '(2)))
+  x)
+
+(p1 1)
+; original -> (1 (2)) 
+; Cy's -> (1 (2))
+
+
+(define (p2 x)
+  (define (p e)
+    e
+    x)
+  (p (set! x (cons x '(2)))))
+
+(p2 1)
+; original -> (1 (2)) ; sets on the way to returning x since set! exp is evaluated
+; Cy's -> 1 ; b/c it doesn't force set! expression and just returns x
