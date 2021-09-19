@@ -93,12 +93,10 @@
 ; ie. (define (f g h x) (g h x))
 
 ;; 4.29: Offer example program that would run much faster with memoization than without
-(define (fibonacci n)
-  ((lambda (fib) (fib fib n))
-   (lambda (f k)
-     (cond ((= k 0) 0)
-           ((= k 1) 1)
-           (else (+ (f f (- k 1)) (f f (- k 2))))))))
+(define (fib n)
+  ((cond ((= k 0) 0)
+         ((= k 1) 1)
+         (else (+ (fib (- k 1)) (fib (- k 2)))))))
 
 ; offer outputs for when following program memoizes and doesn't
 
@@ -116,3 +114,22 @@
 ;;; L-Eval value: ⟨response⟩ -> 100
 ;;; L-Eval input: count
 ;;; L-Eval value: ⟨response⟩ -> 2
+
+;; 4.30: Cy provides defintion of eval-sequence b/c he's worried no side effects will take place if exps aren't forced
+;(define (eval-sequence exps env)
+;  (cond ((last-exp? exps) (eval (first-exp exps) env))
+;        (else (actual-value (first-exp exps) env) 
+;              (eval-sequence (rest-exps exps) env))))
+
+
+
+;(define (for-each proc items)
+;  (if (null? items)
+;      'done
+;      (begin (proc (car items))
+;             (for-each proc (cdr items)))))
+
+;(for-each (lambda (x) (newline) (display x)) (list 57 321 88))
+
+; a. The force-it in actual-value is redundant in Bitdiddle's for-each where each element is displayed b/c display is a primitive
+;    proc that prints to stdout and doesn't return anything
