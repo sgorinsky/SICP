@@ -154,3 +154,10 @@
 (p2 1)
 ; original -> (1 (2)) ; sets on the way to returning x since set! exp is evaluated
 ; Cy's -> 1 ; b/c it doesn't force set! expression and just returns x
+
+; c. Changing eval-sequence does not affect behavior of for-each in a. Why?
+; Because if eval-sequence evaluates forces something that isn't a thunk, it just returns the value of that evaluated expression
+;    and doesn't force it.
+
+; d. Sequences in the evaluator ought to be treated with Cy's approach b/c we should only expect the last expression to be a thunk
+;        if necessary, not everything in between b/c then definitions, for instance, won't get properly evaluated.
