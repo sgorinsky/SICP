@@ -22,3 +22,14 @@
 ; requires lazy evaluator to call cdr
 (define ones (cons 1 ones))
 (define integers (cons 1 (add-lists ones integers)))
+
+;; 4.32: What makes lazy lists "lazier" than streams?
+; Well in lazy lists, both elements of list are thunks to be forced
+; We can take advantage of extra laziness by having lazy lists of lazy lists
+
+;; 4.33: Modify evaluator to handle (car '(a b c))
+; handle eval quoted clause by treating extended quoted expressions as list to be evaluated
+;((quoted? exp)
+; (if (not (pair? (text-of-quotation exp)))
+;     (text-of-quotation exp)
+;     (eval (text-of-quotation exp)) env))
