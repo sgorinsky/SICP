@@ -200,7 +200,8 @@
       (lambda (fn k)
         (cond ((= k 0) 0)
               ((= k 1) 1)
-              (else (+ (fn fn (- k 1)) (fn fn (- k 2)))))))))
+              (else (+ (fn fn (- k 1))
+                       (fn fn (- k 2)))))))))
 
 ; b: Fill in blanks to create f using y operator
 ;(define (f x)
@@ -210,7 +211,7 @@
 ;    (if (= n 0) false (even? (- n 1))))
 ;  (even? x))
 
-(define (f x)
+(define (f-parity x)
   ((lambda (even? odd?)
      (even? even? odd? x))
    (lambda (ev? od? n)

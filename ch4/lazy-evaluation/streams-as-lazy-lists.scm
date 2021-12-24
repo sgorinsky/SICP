@@ -49,3 +49,8 @@
 ; (if (not (pair? (text-of-quotation exp)))
 ;     (text-of-quotation exp)
 ;     (eval (text-of-quotation exp)) env))
+
+
+;; 4.34: Modify the driver loop so that lazy pairs and lists will print in some reasonable way
+; We'll want to tag lazy lists in some way so that we can extract its first contents then provide some indicator like ... to
+;    express the rest of the elements
