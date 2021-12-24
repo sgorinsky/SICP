@@ -43,4 +43,16 @@
 ; retrying to find all infinite pairs of pythag triples
 (define try-again
   (lambda () (amb)))
+
+;; 4.37: Is Ben Bitdiddle's implementation of a-pythagorean-triple-between more efficient than the one in 4.35?
+
+; Yes, it actually is, because it prunes approaches where the pythagorean triple exceeds the square of the hypotenuse
+(define (ben-a-pythagorean-triple-between low high)
+  (let ((i (an-integer-between low high))
+        (hsq (* high high)))
+    (let ((j (an-integer-between i high)))
+      (let ((ksq (+ (* i i) (* j j))))
+        (require (>= hsq ksq))
+        (let ((k (sqrt ksq)))
+          (require (integer? k)) (list i j k))))))
   
