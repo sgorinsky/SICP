@@ -106,3 +106,34 @@
           (list 'fletcher fletcher)
           (list 'miller miller)
           (list 'smith smith))))
+
+;; 4.41: Write an ordinary scheme proc to solve the multiple-dwelling problem
+;(define (ordinary-multiple-dwelling))
+
+;; 4.42: Write program to solve liars puzzle
+(define (liars)
+  (let ((betty (amb 1 2 3 4 5))
+        (ethel (amb 1 2 3 4 5))
+        (joan (amb 1 2 3 4 5))
+        (kitty (amb 1 2 3 4 5))
+        (mary (amb 1 2 3 4 5)))
+
+    (require (or (and (not (= betty 3)) (= kitty 2))
+                 (and (= betty 3) (not (= kitty 2)))))
+    (require (or (and (not (= ethel 1)) (= joan 2))
+                 (and (= ethel 1) (not (= joan 2)))))
+    (require (or (and (not (= joan 3)) (= ethel 5))
+                 (and (= joan 3) (not (= ethel 5)))))
+    (require (or (and (not (= kitty 2)) (= mary 4))
+                 (and (= kitty 2) (not (= mary 4)))))
+    (require (or (and (not (= mary 4)) (= betty 1))
+                 (and (= mary 4) (not (= betty 1)))))
+    (require (distinct? (list betty ethel joan kitty mary)))
+
+    (list (list 'betty betty)
+          (list 'ethel ethel)
+          (list 'joan joan)
+          (list 'kitty kitty)
+          (list 'mary mary))))
+             
+  
