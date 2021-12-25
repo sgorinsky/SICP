@@ -108,8 +108,44 @@
           (list 'smith smith))))
 
 ;; 4.41: Write an ordinary scheme proc to solve the multiple-dwelling problem
-;(define (ordinary-multiple-dwelling))
+(define (ordinary-multiple-dwelling)
+  (define (remove x s)
+    (cond ((null? s) '())
+          ((eq? x (car s)) (remove x (cdr s)))
+          (else (cons (car s) (remove x (cdr s))))))
 
+  (define (permutations s)
+    (if (null? s) (list '())
+        (reduce
+         append
+         '() ;; flatmap
+         (map (lambda (x)
+                (map (lambda (p) (cons x p))
+                     (permutations (remove x s))))
+              s))))
+
+  (define (check-cands perms-list)
+    (if (null? perms-list) '()
+        (let ((perm (car perms-list)))
+          (let ((baker (car perm)) (cooper (cadr perm)) (fletcher (caddr perm)) (miller (cadddr perm)) (smith (cadddr (cdr perm))))
+            (if (or (= baker 5) (= cooper 1)
+                    (= fletcher 5) (= fletcher 1)
+                    (<= miller cooper)
+                    (= (abs (- fletcher cooper)) 1)
+                    (= (abs (- smith fletcher)) 1)
+                    (not (distinct? (list baker cooper fletcher miller smith))))
+                (check-cands (cdr perms-list))
+                (append (list
+                         (list 'baker baker)
+                         (list 'cooper cooper)
+                         (list 'fletcher fletcher)
+                         (list 'miller miller)
+                         (list 'smith smith))
+                        (check-cands (cdr perms-list))))))))
+
+  (check-cands (permutations (list 1 2 3 4 5))))
+  
+    
 ;; 4.42: Write program to solve liars puzzle
 (define (liars)
   (let ((betty (amb 1 2 3 4 5))
