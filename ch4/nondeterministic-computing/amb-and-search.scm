@@ -46,7 +46,8 @@
 
 ;; 4.37: Is Ben Bitdiddle's implementation of a-pythagorean-triple-between more efficient than the one in 4.35?
 
-; Yes, it actually is, because it prunes approaches where the pythagorean triple exceeds the square of the hypotenuse
+; Yes, it actually is, because it prunes approaches k-high when the sum of two squares, i^2 + j^2, exceeds
+;    the square of the hypotenuse
 (define (ben-a-pythagorean-triple-between low high)
   (let ((i (an-integer-between low high))
         (hsq (* high high)))
