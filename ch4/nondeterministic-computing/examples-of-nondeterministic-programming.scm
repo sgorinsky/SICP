@@ -290,3 +290,75 @@
                 noun-phrase
                 (parse-prepositional-phrase)))))
   (maybe-extend (parse-simple-noun-phrase)))
+
+;; 4.45: Five different ways to parse '(the professor lectures to the student with the cat)
+;;       What are the different meanings?
+
+;; Starting a new problem 
+;; Amb-Eval output: 
+;(sentence  
+; (noun-phrase (articles the) (nouns professor))  
+; (verb-phrase (verb-phrase  
+;               (verb-phrase (verb lectures)  
+;                            (pre-phrase (prep to) (noun-phrase (articles the) (nouns student)))) 
+;               (pre-phrase (prep in) (noun-phrase (articles the) (nouns class)))) 
+;              (pre-phrase (prep with) (noun-phrase (articles the) (nouns cat))))) 
+;  
+;; Amb-Eval input: 
+;try-again 
+;  
+;; Amb-Eval output: 
+;(sentence (noun-phrase (articles the) (nouns professor)) 
+;          (verb-phrase (verb-phrase (verb lectures)  
+;                                    (pre-phrase (prep to)  
+;                                                (noun-phrase (articles the)  
+;                                                             (nouns student)))) 
+;                       (pre-phrase (prep in)  
+;                                   (noun-phrase (noun-phrase (articles the) (nouns class)) 
+;                                                (pre-phrase (prep with)  
+;                                                            (noun-phrase (articles the) (nouns cat))))))) 
+;  
+;; Amb-Eval input: 
+;try-again 
+;  
+;; Amb-Eval output: 
+;(sentence (noun-phrase (articles the) (nouns professor)) 
+;          (verb-phrase (verb-phrase (verb lectures)  
+;                                    (pre-phrase (prep to)  
+;                                                (noun-phrase (noun-phrase (articles the) (nouns student))  
+;                                                             (pre-phrase (prep in)  
+;                                                                         (noun-phrase (articles the) (nouns class)))))) 
+;                       (pre-phrase (prep with) (noun-phrase (articles the) (nouns cat))))) 
+;  
+;; Amb-Eval input: 
+;try-again 
+;  
+;; Amb-Eval output: 
+;(sentence (noun-phrase (articles the) (nouns professor))  
+;          (verb-phrase (verb lectures)  
+;                       (pre-phrase (prep to)  
+;                                   (noun-phrase (noun-phrase (noun-phrase (articles the) 
+;                                                                          (nouns student)) 
+;                                                             (pre-phrase (prep in)  
+;                                                                         (noun-phrase (articles the)  
+;                                                                                      (nouns class)))) 
+;                                                (pre-phrase (prep with) (noun-phrase (articles the) (nouns cat))))))) 
+;  
+;; Amb-Eval input: 
+;try-again 
+;  
+;; Amb-Eval output: 
+;(sentence (noun-phrase (articles the) (nouns professor)) 
+;          (verb-phrase (verb lectures)  
+;                       (pre-phrase (prep to) 
+;                                   (noun-phrase (noun-phrase (articles the)  
+;                                                             (nouns student))  
+;                                                (pre-phrase (prep in) 
+;                                                            (noun-phrase (noun-phrase (articles the) 
+;                                                                                      (nouns class))  
+;                                                                         (pre-phrase (prep with) 
+;                                                                                     (noun-phrase (articles the) 
+;                                                                                                  (nouns cat)))))))))
+
+;; 4.46: Why is it important that the amb evaluator evaluates from left-right?
+; *unparsed* is created left to right so the evaluator must do so as well
