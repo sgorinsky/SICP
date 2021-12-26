@@ -11,7 +11,7 @@
 (define (distinct? elements)
   (define (check element lst)
     (cond ((null? lst) #t)
-          ((= element (car lst)) #f)
+          ((equal? element (car lst)) #f)
           (else (check element (cdr lst)))))
   (define (has-false lst)
     (cond ((null? lst) #t)
@@ -175,8 +175,28 @@
 
 
 ;; 4.43: Yacht Puzzle
+(define (yacht)
+  (let ((moore 'mary)
+        (downing (amb 'gabrielle 'lorna 'rosalind))
+        (hall (amb 'gabrielle 'lorna))
+        (barnacle 'melissa)
+        (parker (amb 'lorna 'rosalind)))
 
+    (require (and (not (eq? barnacle 'gabrielle))
+                  (not (eq? moore 'lorna))
+                  (not (eq? hall 'rosalind))
+                  (not (eq? downing 'melissa))))
+    
+    (require (distinct? (list moore downing hall barnacle parker)))
 
+    (list (list 'moore moore)
+          (list 'downing downing)
+          (list 'hall hall)
+          (list 'barnacle barnacle)
+          (list 'parker parker))))
+                  
+             
+    
 ;; 4.44: eight-queens
 (define (eight-queens)
   (define (check-prior-positions coordinate positions)
@@ -191,8 +211,7 @@
   (define (randomize-position)
     (list (amb 1 2 3 4 5 6 7 8) (amb 1 2 3 4 5 6 7 8)))
           
-  (let ((a (randomize-position))
-        (b (randomize-position)))
+  (let ((a (randomize-position)) (b (randomize-position)))
     (require (check-prior-positions b (list a)))
     (let ((c (randomize-position)))
       (require (check-prior-positions c (list a b)))
@@ -207,15 +226,3 @@
               (let ((h (randomize-position)))
                 (require (check-prior-positions h (list a b c d e f g)))
                 (list a b c d e f g h)))))))))
-
-    
-    
-    
-    
-
-    
-             
-  
-  
-             
-  
