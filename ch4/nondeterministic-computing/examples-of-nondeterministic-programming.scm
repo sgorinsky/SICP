@@ -362,3 +362,47 @@
 
 ;; 4.46: Why is it important that the amb evaluator evaluates from left-right?
 ; *unparsed* is created left to right so the evaluator must do so as well
+
+;; 4.47: Does this parse-verb-phrase simplify parsing?
+
+; Doesn't work b/c parse-verb-phrase will call itself infinitely
+
+;(define (parse-verb-phrase)
+;  (amb (parse-word verbs)
+;       (list 'verb-phrase
+;             (parse-verb-phrase)
+;             (parse-prepositional-phrase))))
+
+;; 4.48: Include parser to handle additional building blocks to make more complex sentences
+
+; adjectives
+(define adjectives '(adjective smart witty thoughtful diligent handsome tall)) 
+(define (complex-parse-simple-noun-phrase)       
+  (amb (list 'simple-noun-phrase 
+             (parse-word articles) 
+             (parse-word nouns)) 
+       (list 'simple-noun-phrase 
+             (parse-word articles) 
+             (parse-word adjectives) 
+             (parse-word nouns))))
+
+; adverbs
+(define adverbs '(adverb quickly slowly lazily eagerly)) 
+  
+;; new function, not in book 
+(define (complex-parse-simple-verb) 
+  (amb (list 'simple-verb 
+             (parse-word adverbs) 
+             (parse-word verbs)) 
+       (parse-word verbs))) 
+  
+;; replaces definition from book 
+;; only difference is the call to parse-simple-verb 
+(define (complex-parse-verb-phrase) 
+  (define (maybe-extend verb-phrase) 
+    (amb verb-phrase 
+         (maybe-extend
+          (list 'verb-phrase 
+                verb-phrase 
+                (parse-prepositional-phrase))))) 
+  (maybe-extend (complex-parse-simple-verb))) 
