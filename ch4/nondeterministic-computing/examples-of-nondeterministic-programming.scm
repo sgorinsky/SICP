@@ -406,3 +406,19 @@
                 verb-phrase 
                 (parse-prepositional-phrase))))) 
   (maybe-extend (complex-parse-simple-verb))) 
+
+;; 4.49: Instead of parsing words, generate words by ignoring input sentence and succeeding
+;;       to generate the appropriate word
+(define (list-amb li) 
+  (if (null? li) 
+      (amb) 
+      (amb (car li) (list-amb (cdr li))))) 
+  
+(define (generate-parse-word word-list) 
+  (require (not (null? *unparsed*))) 
+  (require (memq (car *unparsed*) (cdr word-list))) 
+  (let ((found-word (car *unparsed*))) 
+    (set! *unparsed* (cdr *unparsed*)) 
+    (list-amb (cdr word-list))))   ;; change
+
+;(parse '(the student for the student studies for the student)
