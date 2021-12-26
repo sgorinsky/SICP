@@ -1,5 +1,6 @@
 #lang sicp
 
+(define null '())
 (define (require p)
   (if (not p) (amb)))
 
@@ -171,5 +172,50 @@
           (list 'joan joan)
           (list 'kitty kitty)
           (list 'mary mary))))
+
+
+;; 4.43: Yacht Puzzle
+
+
+;; 4.44: eight-queens
+(define (eight-queens)
+  (define (check-prior-positions coordinate positions)
+    (if (null? positions) #t
+        (let* ((xc (car coordinate))
+               (yc (cadr coordinate))
+               (position (car positions))
+               (xp (car position))
+               (yp (cadr position)))
+          (if (or (= xc xp) (= yc yp) (= (abs (- xc xp)) (abs (- yc yp)))) #f
+              (check-prior-positions coordinate (cdr positions))))))
+  (define (randomize-position)
+    (list (amb 1 2 3 4 5 6 7 8) (amb 1 2 3 4 5 6 7 8)))
+          
+  (let ((a (randomize-position))
+        (b (randomize-position)))
+    (require (check-prior-positions b (list a)))
+    (let ((c (randomize-position)))
+      (require (check-prior-positions c (list a b)))
+      (let ((d (randomize-position)))
+        (require (check-prior-positions d (list a b c)))
+        (let ((e (randomize-position)))
+          (require (check-prior-positions e (list a b c d)))
+          (let ((f (randomize-position)))
+            (require (check-prior-positions f (list a b c d e)))
+            (let ((g (randomize-position)))
+              (require (check-prior-positions g (list a b c d e f)))
+              (let ((h (randomize-position)))
+                (require (check-prior-positions h (list a b c d e f g)))
+                (list a b c d e f g h)))))))))
+
+    
+    
+    
+    
+
+    
+             
+  
+  
              
   
