@@ -59,14 +59,12 @@
 
 ;; 4.58: Define a rule that a person is a "big shot" in a division if the person works in
 ;;       a division but doesn't have a supervisor in that division
-
 (rule (big-shot ?person)
       (and (supervisor ?person ?boss)
            (job ?person (?division . ?title))
            (not (job ?boss (?division . ?boss-role))))) ; shouldn't find match for ?division here
 
 ;; 4.59: Finding meetings for people in ord
-
 ; assertions Ben made to add meetings to database
 (meeting accounting (Monday 9am))
 (meeting administration (Monday 10am))
@@ -84,3 +82,18 @@
 
 ; c. Using rule, find all Wednesday meetings for Alyssa P. Hacker
 (meeting-time (Hacker Alyssa P) (Wednesday . ?time))
+
+;; 4.60: Why are people listed twice when querying lives-near?
+; ie.
+(lives-near ?person-1 ?person-2)
+; -> (lives-near (Hacker Alyssa P) (Fect Cy D))
+; -> (lives-near (Fect Cy D) (Hacker Alyssa P))
+
+; Why does this happen?
+; This happens because the query finds all assertions of some p1 living near p2, it isn't
+;     checking the results for consistency
+
+; Is there a way to find a list of people who live near each other, in which each pair
+;     appears only once?
+; Maybe if we defined a rule of sorted retrieval and then make sure our queries were unique,
+;     that would make our results unique
