@@ -32,5 +32,6 @@
 
 ; c. All people supervised by someone who is not in the computer division, together
 ;    with the person's name and job
-(and (supervisor ?person ?super)
-     (not (job ?super (computer . ?rest-of-job)))
+(and (supervisor ?person ?boss)
+     (not (job ?boss (computer . ?rest-of-job)))
+     (job ?person ?job))
