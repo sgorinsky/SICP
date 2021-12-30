@@ -120,3 +120,8 @@
 (?x next-to 1 in (2 1 3 1))
 ; ->  (3 next-to 1 in (2 1 3 1)) 
 ; -> (2 next-to 1 in (2 1 3 1))
+
+;; 4.62: Define rules for last-pair, a proc to get the last pair of a non-empty list
+(rule (last-pair (?x . ()) ?x))
+(rule (last-pair (?u . ?v) ?x)
+      (last-pair ?v ?x))
