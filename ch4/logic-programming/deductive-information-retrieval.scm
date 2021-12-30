@@ -97,3 +97,26 @@
 ;     appears only once?
 ; Maybe if we defined a rule of sorted retrieval and then make sure our queries were unique,
 ;     that would make our results unique
+
+
+;;; Logic as programs
+
+; Defining recursive relation that allows us to assert a logic-like analog to append
+(rule (append-to-form () ?y ?y))
+(rule (append-to-form (?u . ?v) ?y (?u . ?z))
+      (append-to-form ?v ?y ?z))
+
+;; 4.61: For a rule defining a next-to relation, what will be the results of below queries?
+; Rule:
+(rule (?x next-to ?y in (?x ?y . ?u)))
+(rule (?x next-to ?y in (?v . ?z))
+      (?x next-to ?y in ?z))
+
+; What are the results of the below queries?
+(?x next-to ?y in (1 (2 3) 4))
+; -> ((2 3) next-to 4 in (1 (2 3) 4)) 
+; -> (1 next-to (2 3) in (1 (2 3) 4))
+
+(?x next-to 1 in (2 1 3 1))
+; ->  (3 next-to 1 in (2 1 3 1)) 
+; -> (2 next-to 1 in (2 1 3 1))
